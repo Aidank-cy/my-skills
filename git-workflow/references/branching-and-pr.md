@@ -109,9 +109,13 @@ Closes #
 ## Merge strategy decision tree
 
 ```
-Is this a feature branch?
+Is this a feature branch with a single logical change?
 ├── YES → Squash merge
 │         (one clean commit on main)
+│
+Is this a feature branch with multiple meaningful commits?
+├── YES → Rebase and merge
+│         (preserve individual commit history on main)
 │
 Is this a release branch?
 ├── YES → Regular merge commit
@@ -125,6 +129,14 @@ Is this a long-running branch with stacked dependencies?
 └── YES → Rebase and merge
           (preserve individual commits)
 ```
+
+### How to tell single vs multiple
+
+If the branch has one `prompt-gateway` Step 5→6D cycle, it is single.
+If it has 2+ cycles (each with its own CHANGELOG entry and commit),
+it is multiple. When in doubt, check `git log --oneline` on the branch:
+meaningful distinct messages = rebase-and-merge; WIP/fixup messages
+= squash.
 
 ### Squash merge message format
 

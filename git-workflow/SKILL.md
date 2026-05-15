@@ -119,11 +119,23 @@ Use the footer for:
 Bundle related changes into one atomic commit:
 - Code change + its test update + CHANGELOG entry = one commit.
 - AGENTS.md rule update triggered by the change = same commit.
-- Unrelated fixes = separate commits, separate branches.
+
+Separate into distinct commits:
+- Different logical changes within the same user request.
+  One branch, one commit per logic point — not one branch per logic point.
+- Unrelated work that belongs to different user requests = separate branches.
 
 ## Development lifecycle
 
 ### Starting a feature
+
+Before writing any code, verify:
+
+```
+□ Am I on main? → git checkout main && git pull origin main
+□ Did I create a feature branch? → git checkout -b {type}/{name}
+□ Never skip branch creation. Committing to main is a workflow violation.
+```
 
 ```bash
 # 1. Ensure main is current
@@ -143,6 +155,17 @@ Follow `prompt-gateway` for each modification:
 2. Check harness integrity.
 3. Execute and verify.
 4. Finalize: CHANGELOG → rules → progress → local commit.
+
+After each commit, check:
+
+```
+□ git log --oneline on this branch — does each commit
+  represent exactly one logical change?
+□ Does each commit pass lint, typecheck, and tests independently?
+□ Are there more logic points in the original request?
+  → YES: start the next cycle from Step 5.
+  → NO: proceed to preparing for PR.
+```
 
 Multiple commits on one branch are fine for complex features.
 Each commit must independently pass lint, typecheck, and tests.
@@ -200,9 +223,24 @@ Closes #14"
 
 ### Merging
 
-- Use squash merge for feature branches (one clean commit on main).
-- Use regular merge for release branches (preserve release commit history).
-- Delete the branch after merge.
+Before merging, check the branch commit count:
+
+```
+□ Run: git log --oneline origin/main..HEAD
+□ Count meaningful commits (exclude WIP/fixup).
+□ 1 commit → squash merge.
+□ 2+ meaningful commits → rebase and merge.
+□ Release branch → regular merge.
+```
+
+Choose the merge method based on the branch content:
+
+- **Single logical change on a feature branch** → squash merge (one clean commit on main).
+- **Multiple meaningful commits on a feature branch** → rebase and merge (preserve individual commit history on main).
+- **Release branch** → regular merge commit (preserve release history).
+- **Hotfix** → squash merge.
+
+Delete the branch after merge.
 
 ```bash
 # After PR is approved and merged via GitHub

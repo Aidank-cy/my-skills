@@ -188,6 +188,30 @@ If the required fix would exceed scope, stop and ask for guidance.
 
 ## Step 6: Finalize
 
+Step 6 is non-negotiable. Do not return a response to the user
+before completing all sub-steps (6A through 6E) in order.
+Completing the code change without Step 6 is a pipeline failure.
+
+### Pre-finalization checkpoint
+
+Before entering 6A, verify:
+
+```
+□ Am I on a feature branch (not main)?
+  → If on main, stop. Create a branch first per git-workflow.
+□ Did I count distinct logical changes in this request?
+  → If 2+, list them now and process each through Steps 5→6D
+    separately. Do not bundle different logic points into one commit.
+□ Did verification (lint, typecheck, tests) pass?
+  → If not, fix before proceeding. Do not commit broken code.
+```
+
+If the validated prompt contains multiple distinct logical changes,
+decompose into sub-tasks and cycle through Steps 5→6D once per
+logic point. Each cycle produces its own commit with its own
+CHANGELOG entry. Run Step 6E only once after all logic points
+are committed.
+
 Perform all closing steps in order.
 
 ### 6A: Mandatory CHANGELOG handoff
@@ -234,21 +258,60 @@ Append a short completion note to `.harness/progress.md` with:
 
 ### 6D: Local commit
 
-Create an atomic conventional commit following `git-workflow` conventions.
+Before committing, verify:
+
+```
+□ CHANGELOG.md has new entries under [Unreleased] (6A done)?
+□ AGENTS.md / CLAUDE.md updated if needed (6B done)?
+□ .harness/progress.md has a completion note (6C done)?
+□ lint, typecheck, and tests all pass on this change?
+□ The commit contains only one logical change?
+□ No unrelated changes are staged?
+```
+
+If any box is unchecked, go back and fix it before committing.
+
+Create an atomic conventional commit for the current logic point,
+following `git-workflow` conventions.
 Use a commit type that matches the changelog category.
 Keep the subject line under 72 characters, imperative mood.
 Use `feat!:` or `fix!:` only for breaking changes.
 Refer to `git-workflow` for the full Conventional Commits format
 and type-to-category mapping.
 
+After committing, verify:
+
+```
+□ git log -1 shows the expected message and type?
+□ git status --short is clean (no leftover unstaged files)?
+□ Are there more logic points remaining in this request?
+  → YES: go back to Step 5 for the next logic point.
+  → NO: proceed to 6E.
+```
+
+For multi-logic-point requests: repeat Steps 5→6D for each point.
+Each commit must independently pass lint, typecheck, and tests.
+
 ### 6E: Return remote operations to the user
+
+Before returning, verify the full pipeline completed:
+
+```
+□ Every logic point has its own commit?
+□ CHANGELOG has one entry per logic point?
+□ progress.md is updated?
+□ git log shows the expected number of commits on this branch?
+□ Current branch is NOT main?
+```
 
 Do not push, create PRs, or modify remote state.
 Return:
-- local commit hash and message
+- local commit hash(es) and message(s)
 - file count summary
 - CHANGELOG status
 - rules status
+- merge method recommendation: squash (single commit) or
+  rebase-and-merge (multiple commits)
 - suggested next commands per `git-workflow` conventions:
   `git push origin {branch}`, `gh pr create`, or release commands
 
