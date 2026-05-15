@@ -232,10 +232,12 @@ Append a short completion note to `.harness/progress.md` with:
 
 ### 6D: Local commit
 
-Create an atomic conventional commit.
+Create an atomic conventional commit following `git-workflow` conventions.
 Use a commit type that matches the changelog category.
-Keep the subject line concise.
+Keep the subject line under 72 characters, imperative mood.
 Use `feat!:` or `fix!:` only for breaking changes.
+Refer to `git-workflow` for the full Conventional Commits format
+and type-to-category mapping.
 
 ### 6E: Return remote operations to the user
 
@@ -245,7 +247,8 @@ Return:
 - file count summary
 - CHANGELOG status
 - rules status
-- suggested next commands such as `git push` or `gh pr create`
+- suggested next commands per `git-workflow` conventions:
+  `git push origin {branch}`, `gh pr create`, or release commands
 
 ## Integration points
 
@@ -269,6 +272,12 @@ Still close the task with the Step 6 sequence.
 ### With `harness-engineering-transform`
 
 Suggest it when the harness integrity check shows the project scaffold is missing or degraded.
+
+### With `git-workflow`
+
+Defer branch naming, commit format, PR conventions, and merge strategy
+to `git-workflow`. This skill owns execution pipeline timing;
+`git-workflow` owns git operation norms.
 
 ## Anti-rationalization
 

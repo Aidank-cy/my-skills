@@ -132,11 +132,12 @@ If multiple ecosystem version files exist, keep them aligned.
 
 For the local release path:
 - stage the version and changelog changes
-- create a release commit
-- create an annotated `v` tag
+- create a release commit: `chore(release): bump to v{x.y.z}`
+- create an annotated `v` tag: `git tag -a v{x.y.z} -m "Release v{x.y.z}"`
 
 For remote operations:
 - push, PR creation, and hosted release publication remain user-owned unless the user explicitly asks for them
+- defer push and merge mechanics to `git-workflow`
 
 ## Release checklist
 
@@ -165,6 +166,13 @@ Seed it with:
 
 Take over when the user says `release`, `bump version`, `tag`, `发版`, or equivalent.
 Compute the bump from real unreleased work, not from guesswork.
+
+### With `git-workflow`
+
+Own version and CHANGELOG decisions. Defer git mechanics (branch
+management, tagging format, push strategy, merge policy) to
+`git-workflow`. The two skills share the commit-type-to-category
+mapping table — keep them aligned.
 
 ## Anti-rationalization
 
