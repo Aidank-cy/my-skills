@@ -7,9 +7,10 @@ description: >
   "scaffold a project", "set up a new codebase", or "harness 项目".
   Bootstrap the standard project first, then generate a harness
   engineering scaffold with AGENTS.md, CHANGELOG.md, .harness,
-  skills, hooks, and CI so the repository is agent-ready from day one.
-  Use this skill only for new projects; use harness-engineering-transform
-  for existing codebases.
+  hooks, and CI so the repository is agent-ready from day one.
+  Core pipeline skills are user-level and not duplicated into the
+  project. Use this skill only for new projects; use
+  harness-engineering-transform for existing codebases.
 ---
 
 # Harness Init
@@ -73,7 +74,6 @@ Generate these core artifacts:
 - `AGENTS.md`
 - `CHANGELOG.md`
 - `.harness/`
-- `skills/`
 - `hooks/`
 - CI quality gate workflow
 
@@ -82,13 +82,17 @@ Generate optional artifacts based on project shape:
 - `.cursor/rules/`
 - `.github/copilot-instructions.md`
 - `agents/`
-- extra domain skills such as API, database, frontend, or security skills
+- `skills/` — only for project-specific domain skills (API, database, frontend, security)
+
+Core pipeline skills (`prompt-gateway`, `versioning-and-changelog`,
+`git-workflow`, `skill-authoring`, `sync-filter`) are user-level.
+Do not duplicate them into the project's `skills/` directory.
 
 Use these generation rules:
 - generate `AGENTS.md` with real commands and a three-tier boundary model
 - mark inferred startup rules with `[INITIAL]`
 - generate `CHANGELOG.md` with Keep a Changelog structure
-- create a meta skill router and a versioning skill in `skills/`
+- create project-specific domain skills in `skills/` only when the codebase justifies them (2+ distinct domains, complex API, database layer, etc.)
 - tailor hooks and CI to the actual toolchain
 - generate at least one example file when the project would otherwise have no pattern reference
 

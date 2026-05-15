@@ -109,8 +109,11 @@ Catch drift before execution.
 | `.harness/` | harness runtime container |
 | `.harness/progress.md` | cross-session state |
 | `.harness/task-template.md` | Tier A reference format |
-| `skills/` | skill library root |
-| `skills/versioning-and-changelog/SKILL.md` | hard dependency for Step 6A |
+
+Core pipeline skills (`versioning-and-changelog`, `git-workflow`,
+`prompt-gateway`) are user-level and always available. Do not check
+for them inside the project. Only project-specific domain skills
+live in the project's `skills/` directory.
 
 ### Decision rule
 
@@ -125,7 +128,6 @@ Warn, but do not block, when these are missing:
 - `.harness/impact-map.sh`
 - `.harness/anti-rationalization.md`
 - `CLAUDE.md`
-- `skills/using-skills/SKILL.md`
 
 ## Step 4: Read project state and build the plan
 

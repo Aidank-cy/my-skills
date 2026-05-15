@@ -106,13 +106,18 @@ Add these only when justified by the audit:
 ### Scaffold decisions
 
 Use these rules:
-- any project gets `CHANGELOG.md` and a versioning skill path
+- any project gets `CHANGELOG.md`; versioning logic is handled by the user-level `versioning-and-changelog` skill
 - Claude Code projects get `CLAUDE.md`
 - Cursor projects get `.cursor/rules/`
-- larger or multi-domain projects get more skills
+- larger or multi-domain projects get project-specific domain skills in `skills/`
 - large or multi-domain projects may justify reviewer personas
 - existing CI should be extended instead of duplicated
 - sensitive projects should receive stronger hooks and a security reviewer
+
+Core pipeline skills (`prompt-gateway`, `versioning-and-changelog`,
+`git-workflow`) are user-level and always available. Do not duplicate
+them into the project. The project's `skills/` directory is reserved
+for domain-specific skills unique to that codebase.
 
 For the full scaffold matrix, read `references/generated-artifacts.md`.
 
@@ -145,8 +150,11 @@ Pair important probabilistic rules with deterministic enforcement where possible
 
 ### Skills and personas
 
-Generate 2-5 project-specific skills when the codebase justifies them.
-Always include a router skill when generating a skill library.
+Generate 2-5 project-specific domain skills in `skills/` when the
+codebase justifies them (e.g. API routing, database migrations,
+frontend components, security policies). These complement the
+user-level pipeline skills, not replace them.
+Include a router skill only when generating 3+ project-specific skills.
 Generate personas only for larger or clearly multi-domain codebases.
 
 ### Progress and anti-rationalization files
