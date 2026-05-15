@@ -82,3 +82,4 @@ Read on demand — do not load all by default.
 | Setting up sync for a new project | `references/setup-guide.md` |
 | Running a periodic sync audit | `references/audit.md` |
 | Need private/public patterns for a specific stack | `references/project-patterns.md` |
+| Need a standalone sync-guard for non-skill-aware tools | `SYNC-GUARD.md` |

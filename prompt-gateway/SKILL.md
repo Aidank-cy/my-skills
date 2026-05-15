@@ -261,16 +261,6 @@ This skill owns pipeline timing.
 `versioning-and-changelog` owns changelog categorization and insertion format.
 Do not skip either side of that contract.
 
-### With `spec-driven-development`
-
-Treat a Claude Code processed prompt as the spec.
-Do not add another spec phase.
-
-### With `incremental-implementation`
-
-Split HIGH or CRITICAL work into smaller verified steps when appropriate.
-Still close the task with the Step 6 sequence.
-
 ### With `harness-engineering-transform`
 
 Suggest it when the harness integrity check shows the project scaffold is missing or degraded.
