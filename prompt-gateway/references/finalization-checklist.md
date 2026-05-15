@@ -145,7 +145,7 @@ The `[NEW]` tag tells the user: "I added this during task execution. Review it."
 | Only changes docs | `docs` |
 | Only changes tests | `test` |
 | Build/tooling/config changes | `chore` |
-| Breaks backward compatibility | `feat!` or `fix!` |
+| Breaks backward compatibility | `feat!:` or `fix!:` |
 
 ### Scope (optional, from spec's ## Scope)
 

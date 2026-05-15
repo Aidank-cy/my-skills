@@ -281,6 +281,12 @@ Defer branch naming, commit format, PR conventions, and merge strategy
 to `git-workflow`. This skill owns execution pipeline timing;
 `git-workflow` owns git operation norms.
 
+### With `harness-remote-handoff`
+
+Step 6E is the handoff trigger. `harness-remote-handoff` governs
+what the user does after this skill returns remote operations,
+and how to recover context when the user returns.
+
 ## Anti-rationalization
 
 Reject these shortcuts:

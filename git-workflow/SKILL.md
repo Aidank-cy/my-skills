@@ -105,7 +105,7 @@ category assigned by `versioning-and-changelog`.
 | `docs` | Changed | PATCH |
 | `test` | Changed | PATCH |
 | `chore` | Changed | PATCH |
-| `feat!` / `fix!` | depends | MAJOR |
+| `feat!:` / `fix!:` | depends | MAJOR |
 
 ### Body and footer
 
@@ -281,6 +281,12 @@ When the project uses a dev→public sync pipeline, classify all
 harness files as PRIVATE per `sync-filter` rules. Git workflow
 artifacts (branch conventions, PR templates) are internal process
 and should not sync to the public repo.
+
+### With `harness-remote-handoff`
+
+After the release git commands are returned to the user,
+`harness-remote-handoff` manages the handoff protocol and
+context recovery for the next session.
 
 ## Anti-rationalization
 
