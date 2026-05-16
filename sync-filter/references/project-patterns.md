@@ -6,7 +6,7 @@ then adjust per project.
 ## Next.js / React
 
 ```
-PRIVATE: AGENTS.md, CLAUDE.md, EDITING.md, CHANGELOG.md,
+PRIVATE: AGENTS.md, CLAUDE.md, EDITING.md, CHANGELOG.md, TODO.md,
          .project-rules/, .harness/, .cursor/, skills/, hooks/,
          .github/copilot-instructions.md,
          .github/workflows/ai-quality-gate.yml,
@@ -15,7 +15,8 @@ PRIVATE: AGENTS.md, CLAUDE.md, EDITING.md, CHANGELOG.md,
 PUBLIC:  app/, components/, lib/, config/, public/,
          package.json, package-lock.json, next.config.ts,
          tsconfig.json, eslint.config.mjs, postcss.config.mjs,
-         .gitignore, README.md, LICENSE
+         .gitignore, README.md, LICENSE,
+         .github/workflows/auto-close-pr.yml
 ```
 
 ## Python / FastAPI
@@ -26,7 +27,8 @@ PRIVATE: AGENTS.md, CLAUDE.md, .cursor/, .project-rules/,
          .github/workflows/sync-public.yml
 
 PUBLIC:  src/, tests/ (public tests), requirements.txt,
-         pyproject.toml, Dockerfile, README.md, LICENSE
+         pyproject.toml, Dockerfile, README.md, LICENSE,
+         .github/workflows/auto-close-pr.yml
 ```
 
 ## Monorepo
@@ -36,7 +38,8 @@ PRIVATE: Root AI/tooling files (same as above),
          packages/internal-*/, tools/dev-only/
 
 PUBLIC:  packages/public-*/, apps/,
-         root configs, README.md, LICENSE
+         root configs, README.md, LICENSE,
+         .github/workflows/auto-close-pr.yml
 ```
 
 ## Rust / Cargo
@@ -47,5 +50,6 @@ PRIVATE: AGENTS.md, CLAUDE.md, .cursor/, .project-rules/,
          .github/workflows/sync-public.yml
 
 PUBLIC:  src/, Cargo.toml, Cargo.lock, tests/,
-         README.md, LICENSE
+         README.md, LICENSE,
+         .github/workflows/auto-close-pr.yml
 ```

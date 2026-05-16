@@ -25,4 +25,9 @@ comm -23 /tmp/all-files.txt /tmp/private-files.txt
 4. Check that no private patterns were accidentally removed from the workflow
 5. Verify the public repo does not contain any files from the private list
    (clone it and diff if needed)
-6. Report findings to the user
+6. Verify `auto-close-pr.yml` is NOT in the `rm` list (it must sync)
+7. Check that the secret name in the workflow matches the actual secret
+   in Settings → Secrets → Repository secrets
+8. Confirm the public repo's Ruleset is still active with correct
+   bypass list
+9. Report findings to the user
