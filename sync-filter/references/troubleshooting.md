@@ -92,11 +92,11 @@ GitHub requires a separate `workflow` scope/permission to push any
 file under `.github/workflows/`. This is a security measure — workflow
 files can execute arbitrary code.
 
-**Fix (Classic token):** Check both `repo` AND `workflow` scopes.
-Regenerate. Update the secret.
-
 **Fix (Fine-grained token):** Add Workflows → Read and write under
 Repository permissions. Regenerate. Update the secret.
+
+**Fix (Classic token):** Check both `repo` AND `workflow` scopes.
+Regenerate. Update the secret.
 
 **Alternative:** If adding `workflow` scope is undesirable, exclude
 workflow files from sync and manage them manually in the public repo:

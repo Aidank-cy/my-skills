@@ -21,34 +21,37 @@ REVIEW:  .env.example Makefile
 
 ## Step 3: Create the PAT
 
-### Option A: Classic token (recommended)
-
-GitHub avatar → Settings → Developer settings → Personal access tokens
-→ Tokens (classic) → Generate new token:
-
-- Note: descriptive name (e.g. `portfolio-sync`)
-- Expiration: choose an appropriate period
-- Scopes: check **`repo`** (top-level, selects all sub-scopes)
-  AND **`workflow`** (required if syncing any `.github/workflows/` files)
-
-Click Generate token. Copy using the **copy button**, not manual
-text selection.
-
-### Option B: Fine-grained token
+### Option A: Fine-grained token (recommended)
 
 GitHub avatar → Settings → Developer settings → Personal access tokens
 → Fine-grained tokens → Generate new token:
 
-- Token name: descriptive name
+- Token name: descriptive name (e.g. `portfolio-sync`)
+- Expiration: choose an appropriate period
 - Resource owner: your username
 - Repository access: **Only select repositories** → select the
   **public** repo only
 - Permissions → Repository permissions:
   - **Contents**: Read and write
-  - **Metadata**: Read-only (auto-selected)
   - **Workflows**: Read and write
+  - Metadata: Read-only (auto-selected)
 
-Generate and copy with the copy button.
+Click Generate token. Copy using the **copy button**, not manual
+text selection.
+
+More secure than classic — scoped to a single repo with minimal
+permissions.
+
+### Option B: Classic token (alternative)
+
+GitHub avatar → Settings → Developer settings → Personal access tokens
+→ Tokens (classic) → Generate new token:
+
+- Note: descriptive name
+- Scopes: check **`repo`** (top-level) AND **`workflow`**
+
+Generate and copy with the copy button. Simpler but grants broader
+access across all repos.
 
 ### Verify the token locally
 

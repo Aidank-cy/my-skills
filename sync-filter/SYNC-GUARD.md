@@ -52,8 +52,8 @@ from the repository admin (via PAT). External PRs are auto-closed by
 
 - Secret naming: `{TARGET_REPO_SHORT}_PAT` (e.g. `PORTFOLIO_PAT`)
 - Store in **Repository secrets**, never in Repository variables
-- Classic tokens need `repo` + `workflow` scopes
-- Fine-grained tokens need Contents + Metadata + Workflows permissions
+- Fine-grained tokens (recommended): Contents + Workflows (Read & write)
+- Classic tokens (alternative): `repo` + `workflow` scopes
 - Never hardcode tokens in workflow files — always use `${{ secrets.NAME }}`
 - Never paste tokens into chat, comments, issues, or logs
 

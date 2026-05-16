@@ -63,15 +63,18 @@ Store in: private repo → Settings → Secrets and variables → Actions →
 
 ### Token types
 
-**Classic token (recommended for simplicity):**
-- Scopes required: `repo` + `workflow`
-- `workflow` scope is mandatory when syncing any `.github/workflows/*.yml`
-  file — GitHub isolates workflow file permissions from content permissions
+**Fine-grained token (recommended):**
+- Repository access: **Only select repositories** → select only the
+  target public repo
+- Permissions → Repository permissions:
+  - **Contents**: Read and write
+  - **Workflows**: Read and write
+  - Metadata: Read-only (auto-selected)
+- More secure — scoped to a single repo with minimal permissions
 
-**Fine-grained token:**
-- Repository access: select only the target public repo
-- Permissions: Contents (Read & write), Metadata (Read-only),
-  Workflows (Read & write)
+**Classic token (alternative):**
+- Scopes required: `repo` + `workflow`
+- Simpler to set up but grants broader access across all repos
 
 ### Credential handling in the workflow
 
