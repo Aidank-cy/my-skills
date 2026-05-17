@@ -3,11 +3,14 @@ name: git-workflow
 description: >
   This skill should be used when the user asks to "commit code",
   "create a branch", "open a PR", "merge a feature", "push changes",
-  "release", "git操作", "提交代码", "创建分支", or needs guidance on
-  branch naming, commit conventions, merge strategy, or the full
-  git lifecycle for a harness-managed project. Governs the git
-  operation norms that connect prompt-gateway (execution pipeline)
-  and versioning-and-changelog (release pipeline) into a unified
+  "release", "git操作", "提交代码", "创建分支", "切换分支",
+  "下一个功能", or needs guidance on branch naming, commit conventions,
+  merge strategy, multi-feature branch isolation, or the full git
+  lifecycle for a harness-managed project. Also trigger when the agent
+  is about to start a second feature in the same session and needs to
+  verify branch state before proceeding. Governs the git operation
+  norms that connect prompt-gateway (execution pipeline) and
+  versioning-and-changelog (release pipeline) into a unified
   development flow. Do not use for non-git questions or general
   coding tasks.
 ---
@@ -73,6 +76,87 @@ Rules:
 7. Delete branch after merge
 ```
 
+## Sequential multi-feature workflow
+
+When a session involves modifying multiple features or skills in
+sequence, enforce strict branch isolation. Each feature gets its own
+branch; never stack unrelated changes onto an existing feature branch.
+
+### Pre-feature state gate
+
+Run this check **before** starting each feature in a multi-feature
+session. No exceptions, even if the next change feels trivial.
+
+```
+□ Am I on main?
+  → NO: a previous feature branch is still active.
+    Stop. Complete or abort it first (see Close-and-switch below).
+  → YES: continue.
+□ Is main up to date with the previous feature's merge?
+  → Run: git log --oneline -1
+  → Confirm the latest commit is the merge of the previous feature
+    branch (or the initial state if this is the first feature).
+  → If not, run: git pull origin main
+□ Working tree clean?
+  → Run: git status --short
+  → If dirty, stash or discard before branching.
+```
+
+Only after all three boxes are checked, create the new feature branch:
+
+```bash
+git checkout -b {type}/{short-description}
+```
+
+### Close-and-switch protocol
+
+After completing a feature (all commits done, checks passed), close
+the branch before starting the next feature:
+
+```bash
+# 1. Final commit on the feature branch (prompt-gateway Step 6D)
+git add -A
+git commit -m "{type}({scope}): {description}"
+
+# 2. Switch to main and merge
+git checkout main
+git merge {feature-branch} --no-ff   # or squash, per merge strategy
+# For local-only workflow without PR:
+#   git merge --squash {feature-branch} && git commit
+
+# 3. Delete the completed branch
+git branch -d {type}/{short-description}
+
+# 4. Verify clean state
+git status --short   # expect clean
+git log --oneline -3 # confirm merge commit
+
+# 5. Now safe to create the next feature branch
+```
+
+### Decision table
+
+| Current state | Action |
+|---------------|--------|
+| On main, clean, previous merge confirmed | Create new branch → start work |
+| On main, dirty working tree | Stash or discard → then create branch |
+| On feature branch, work uncommitted | Commit or stash → merge to main → new branch |
+| On feature branch, work committed but not merged | Merge to main → delete branch → new branch |
+| On wrong feature branch (drift detected) | Abort. Stash changes. Return to main. Merge or discard the stale branch. Restart. |
+
+### Anti-drift signals
+
+Watch for these signs that branch isolation has broken:
+
+- `git log --oneline` shows commits for feature B on a branch named
+  for feature A.
+- `git diff main --stat` shows files unrelated to the current branch
+  name.
+- The branch has been alive for more than one feature request.
+
+If any signal fires, stop immediately. Do not add more commits.
+Return to main via the close-and-switch protocol.
+
 ## Commit conventions
 
 Follow Conventional Commits. Match the commit type to the changelog
@@ -129,10 +213,14 @@ Separate into distinct commits:
 
 ### Starting a feature
 
-Before writing any code, verify:
+Before writing any code, run the pre-feature state gate
+(see "Sequential multi-feature workflow" above).
 
 ```
 □ Am I on main? → git checkout main && git pull origin main
+□ Is main clean and up to date? → git status --short (expect empty)
+□ If this is part of a multi-feature session, was the previous
+  feature branch merged and deleted? → git branch (no stale branches)
 □ Did I create a feature branch? → git checkout -b {type}/{name}
 □ Never skip branch creation. Committing to main is a workflow violation.
 ```
@@ -336,6 +424,9 @@ Reject these shortcuts:
 - Creating a PR without a CHANGELOG entry.
 - Using merge commits on feature branches instead of rebase.
 - Tagging a release without running `versioning-and-changelog` Flow 2.
+- Adding feature B commits to feature A's branch "because it's faster".
+- Skipping the pre-feature state gate "because I know main is clean".
+- Deferring the merge-to-main step "to batch multiple features together".
 
 ## References
 

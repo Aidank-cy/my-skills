@@ -4,14 +4,17 @@ description: >
   This skill should be used when the user asks to add, modify, remove,
   refactor, or fix project functionality, including prompts like "add
   feature", "fix bug", "modify X", "implement Y", "添加功能",
-  "修改功能", "新增", or "修复". Validate that the task is
-  structured as either a full spec or a lightweight spec, reject vague
-  prompts with guidance, map valid prompts into a project-aware execution
-  plan, and orchestrate the full pipeline: harness integrity check,
-  execution, mandatory handoff to versioning-and-changelog for CHANGELOG
-  updates, rule updates when needed, local commit, and handoff of remote
-  operations to the user. Do not use this skill for questions,
-  explanations, reviews, release-only tasks, or other read-only work.
+  "修改功能", "新增", "修复", "接下来修改", or "下一个功能".
+  Validate that the task is structured as either a full spec or a
+  lightweight spec, reject vague prompts with guidance, verify branch
+  state before execution (preventing feature drift in multi-feature
+  sessions), map valid prompts into a project-aware execution plan,
+  and orchestrate the full pipeline: branch state gate, harness
+  integrity check, execution, mandatory handoff to
+  versioning-and-changelog for CHANGELOG updates, rule updates when
+  needed, local commit, and branch close-and-switch when transitioning
+  between features. Do not use this skill for questions, explanations,
+  reviews, release-only tasks, or other read-only work.
 ---
 
 # Prompt Gateway
@@ -32,12 +35,45 @@ A task that skips the CHANGELOG handoff is incomplete.
 
 ## Workflow
 
+0. Verify branch state (multi-feature gate).
 1. Classify the request.
 2. Validate the prompt structure.
 3. Check harness integrity.
 4. Read project state and build an execution plan.
 5. Execute and verify the change.
 6. Finalize with mandatory CHANGELOG, rules review, progress update, and local commit.
+
+## Step 0: Branch state gate
+
+Before entering the pipeline, verify git branch state. This prevents
+feature drift where unrelated changes accumulate on the wrong branch.
+
+```
+□ Am I on main?
+  → YES and this is the first feature in the session: proceed to Step 1.
+  → YES and a previous feature was just merged: proceed to Step 1.
+  → NO (on a feature branch):
+    ├── Is the current branch's work complete and committed?
+    │   → YES: run git-workflow close-and-switch protocol first.
+    │          Merge to main, delete branch, verify clean state.
+    │          Then proceed to Step 1.
+    │   → NO: finish the current feature first (Steps 5→6D),
+    │          then close-and-switch, then proceed to Step 1.
+    └── Does the current branch name match this new feature?
+        → If it does not match, this is feature drift. Stop.
+```
+
+After the gate passes, create the feature branch per `git-workflow`
+branch naming conventions:
+
+```bash
+git checkout main
+git pull origin main       # ensure latest
+git checkout -b {type}/{short-description}
+```
+
+Skip Step 0 only when resuming work on an existing feature branch
+that was intentionally left open from a previous session.
 
 ## Step 1: Classify
 
@@ -292,7 +328,7 @@ After committing, verify:
 For multi-logic-point requests: repeat Steps 5→6D for each point.
 Each commit must independently pass lint, typecheck, and tests.
 
-### 6E: Return remote operations to the user
+### 6E: Return remote operations or transition to next feature
 
 Before returning, verify the full pipeline completed:
 
@@ -304,6 +340,8 @@ Before returning, verify the full pipeline completed:
 □ Current branch is NOT main?
 ```
 
+#### Single-feature session (default)
+
 Do not push, create PRs, or modify remote state.
 Return:
 - local commit hash(es) and message(s)
@@ -314,6 +352,38 @@ Return:
   rebase-and-merge (multiple commits)
 - suggested next commands per `git-workflow` conventions:
   `git push origin {branch}`, `gh pr create`, or release commands
+
+#### Multi-feature session (next feature pending)
+
+When there are more features to process in the same session,
+do not return to the user. Instead, run the close-and-switch
+protocol from `git-workflow`:
+
+```bash
+# 1. Merge current feature to main
+git checkout main
+git merge {current-branch} --no-ff
+
+# 2. Delete completed branch
+git branch -d {current-branch}
+
+# 3. Verify clean state
+git status --short        # expect clean
+git log --oneline -3      # confirm merge
+
+# 4. Re-enter Step 0 for the next feature
+```
+
+Log each completed feature in a session summary. After the final
+feature, return remote operations as in the single-feature path.
+
+### Distinguishing logic points from features
+
+| Scenario | Treatment |
+|----------|-----------|
+| One request with multiple code changes in the same scope | Multi-logic-point: same branch, one commit per logic point (Steps 5→6D loop) |
+| One session with separate, unrelated modifications | Multi-feature: one branch per modification, close-and-switch between each |
+| Ambiguous | If the changes could be named with different branch prefixes or touch different modules, treat as multi-feature |
 
 ## Integration points
 
@@ -330,9 +400,12 @@ Suggest it when the harness integrity check shows the project scaffold is missin
 
 ### With `git-workflow`
 
-Defer branch naming, commit format, PR conventions, and merge strategy
-to `git-workflow`. This skill owns execution pipeline timing;
-`git-workflow` owns git operation norms.
+Defer branch naming, commit format, PR conventions, merge strategy,
+and the close-and-switch protocol to `git-workflow`. This skill owns
+execution pipeline timing; `git-workflow` owns git operation norms.
+Step 0 (branch state gate) and Step 6E (multi-feature transition)
+are jointly governed: this skill triggers the checks, `git-workflow`
+defines the mechanics.
 
 ### With `harness-remote-handoff`
 
@@ -349,6 +422,9 @@ Reject these shortcuts:
 - writing a custom changelog entry instead of handing off to `versioning-and-changelog`
 - skipping the harness integrity check
 - treating source changes as too small for the pipeline
+- skipping Step 0 because "I'm already on a branch and it's fine"
+- adding feature B to feature A's branch "to save time"
+- deferring the merge-to-main step until all features are done
 
 ## References
 
