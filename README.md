@@ -35,7 +35,7 @@ harness-remote-handoff ── user pushes main to remote
 Release flow:
 
 ```
-User says "发版" / "release"
+User says "release" / "cut a release"
   │
   ▼
 versioning-and-changelog ── review unreleased entries

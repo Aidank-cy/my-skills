@@ -7,12 +7,29 @@ present the relevant block to the user at each boundary.
 
 ## Task completion cycle (default — auto-merge)
 
-### After task merged to main → user syncs remote
+### After task merged to main → user verifies and syncs
 
 ```bash
-# Push all merged work to remote
+# 1. Review what changed
+git diff HEAD~1
+
+# 2. Confirm build passes (adapt to project toolchain)
+npm run build            # Node.js / Next.js
+# cargo build            # Rust
+# python -m pytest       # Python
+# go build ./...         # Go
+
+# 3. Visually inspect (adapt to what changed)
+npm run dev              # start dev server → check localhost:3000
+# open src/path/to/file  # open changed file directly
+# curl localhost:8080/api # test API endpoint
+
+# 4. Push all merged work to remote
 git push origin main
 ```
+
+The agent must replace the example commands above with the project's
+actual commands. Every command must be runnable as-is.
 
 That's it. The feature branch was already merged and deleted
 locally by prompt-gateway Step 6E.
@@ -143,10 +160,20 @@ cat package.json | grep '"version"'
 
 ## Hotfix cycle
 
-### Agent merges hotfix to main → user pushes
+### Agent merges hotfix to main → user verifies and pushes
 
 ```bash
-# Hotfix already merged to main locally
+# 1. Review the fix
+git diff HEAD~1
+
+# 2. Confirm build passes
+npm run build            # adapt to project toolchain
+
+# 3. Confirm the fix works
+npm run dev              # inspect visually, or:
+# npm test               # run relevant tests
+
+# 4. Push
 git push origin main
 ```
 
@@ -155,7 +182,7 @@ git push origin main
 User tells agent:
 
 ```
-"发版" / "release a patch" / "ship the hotfix"
+"release a patch" / "ship the hotfix" / "cut a release"
 ```
 
 Agent runs `versioning-and-changelog` Flow 2, which detects only

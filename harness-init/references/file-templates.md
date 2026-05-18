@@ -249,7 +249,7 @@ Before starting any task, check which skill applies:
 
 - **spec-driven-development** — Use when starting any new feature or significant change. Write a spec before writing code.
 - **incremental-implementation** — Use for any task that touches >3 files. Build in small, tested increments.
-- **versioning-and-changelog** — Use when the user says "release", "bump version", "发版", or after finishing a feature to record changes. Also updates CHANGELOG.md during incremental implementation.
+- **versioning-and-changelog** — Use when the user says "release", "bump version", "cut a release", or after finishing a feature to record changes. Also updates CHANGELOG.md during incremental implementation.
 {add lines for additional skills generated based on project profile}
 
 ## Non-negotiable
@@ -505,7 +505,7 @@ and this project adheres to [Semantic Versioning](https://semver.org).
 ```markdown
 ---
 name: versioning-and-changelog
-description: "Track project changes and manage version releases. Trigger when the user says 'release', 'bump version', 'tag', '发版', '版本迭代', or after finishing a feature to record changes in CHANGELOG.md."
+description: "Track project changes and manage version releases. Trigger when the user says 'release', 'bump version', 'tag', 'cut a release', 'version iteration', or after finishing a feature to record changes in CHANGELOG.md."
 ---
 
 # Versioning & Changelog

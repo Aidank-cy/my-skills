@@ -3,8 +3,8 @@ name: git-workflow
 description: >
   This skill should be used when the user asks to "commit code",
   "create a branch", "merge a feature", "push changes", "release",
-  "git操作", "提交代码", "创建分支", "切换分支", "合并分支",
-  "下一个功能", or needs guidance on branch naming, commit
+  "git operations", "commit code", "create branch", "switch branch", "merge branch",
+  "next feature", or needs guidance on branch naming, commit
   conventions, merge strategy, or the task-based branch lifecycle.
   Also trigger when the agent is about to start a new task and needs
   to verify branch state, or when a task is complete and ready for

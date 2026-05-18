@@ -4,7 +4,7 @@ description: >
   This skill should be used when the user asks to create a new project,
   initialize a new repository, scaffold an app, run an init command, or
   says things like "new project", "init a repo", "create a project",
-  "scaffold a project", "set up a new codebase", or "harness 项目".
+  "scaffold a project", "set up a new codebase", or "harness project".
   Bootstrap the standard project first, then generate a harness
   engineering scaffold with AGENTS.md, CHANGELOG.md, .harness,
   hooks, and CI so the repository is agent-ready from day one.

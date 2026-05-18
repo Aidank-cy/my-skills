@@ -3,8 +3,8 @@ name: prompt-gateway
 description: >
   This skill should be used when the user asks to add, modify, remove,
   refactor, or fix project functionality, including prompts like "add
-  feature", "fix bug", "modify X", "implement Y", "添加功能",
-  "修改功能", "新增", "修复", "接下来修改", "下一个功能", or any
+  feature", "fix bug", "modify X", "implement Y", "add functionality",
+  "modify functionality", "new feature", "fix issue", "next change", "next feature", or any
   code-change request. Route every code-modification prompt through
   a task-based gate: decompose the prompt into a task with subtasks,
   create a feature branch, execute all subtasks, verify, commit, and
@@ -255,11 +255,42 @@ git status --short          # expect clean
 git log --oneline -3        # confirm merge
 ```
 
-Return to the user:
+Return to the user in this order:
+
+**1. Task summary:**
 - Commit hash(es) and message(s)
 - File count summary
 - CHANGELOG status
 - Merge confirmation
+
+**2. User verification commands:**
+
+Present concrete commands the user can run to inspect and verify the
+changes before pushing. Tailor these to the project's actual toolchain
+and the files changed in the task. Always include at minimum:
+- A diff command to review what changed
+- The project's build or typecheck command
+- A way to visually inspect or run the result (dev server, open file,
+  run CLI, etc.)
+
+Example:
+
+```
+Verify the changes:
+  git diff HEAD~1                    # review what changed
+  cd {project} && npm run build      # confirm build passes
+  npm run dev                        # inspect at localhost:3000
+```
+
+Adapt the commands to the real project. Use `pytest`, `cargo test`,
+`go build`, or whatever the project actually runs. If the change is
+visual, suggest opening the relevant page or component. If it is a
+CLI tool, suggest running it with a test input. Do not include generic
+placeholder commands — every command must be runnable as-is.
+
+**3. Remote sync (handoff to `harness-remote-handoff`):**
+
+Present the git push command(s) per `harness-remote-handoff`.
 
 The project is now on main, ready for the next task.
 

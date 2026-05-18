@@ -5,8 +5,8 @@ description: >
   engineering to an existing project, create AGENTS.md or CLAUDE.md,
   add agent rules, set up hooks or AI quality gates, scaffold skills or
   subagent personas, or says things like "make my repo agent-friendly",
-  "set up coding agent rules", "agent harness", "harness 工程", or
-  "让我的项目支持 AI agent". Audit the current codebase, infer likely
+  "set up coding agent rules", "agent harness", "harness engineering", or
+  "make my project support AI agents". Audit the current codebase, infer likely
   failure modes, scaffold only the harness files the project actually
   needs, and generate model-agnostic agent guidance, hooks, templates,
   skills, and CI that fit the existing architecture.

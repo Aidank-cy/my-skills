@@ -3,8 +3,8 @@ name: versioning-and-changelog
 description: >
   This skill should be used when the user asks to update a changelog,
   bump a version, cut a release, tag a release, ship code, or says
-  things like "release", "bump version", "tag", "发版",
-  "更新版本", or "ship it". Trigger automatically after a code
+  things like "release", "bump version", "tag", "cut a release",
+  "update version", or "ship it". Trigger automatically after a code
   modification task completes so CHANGELOG.md is updated under
   [Unreleased] before commit. Manage SemVer decisions, release
   sections, version-file updates, tagging, and release handoff.
@@ -164,7 +164,7 @@ Seed it with:
 
 ### With release workflows
 
-Take over when the user says `release`, `bump version`, `tag`, `发版`, or equivalent.
+Take over when the user says `release`, `bump version`, `tag`, `cut a release`, or equivalent.
 Compute the bump from real unreleased work, not from guesswork.
 
 ### With `git-workflow`

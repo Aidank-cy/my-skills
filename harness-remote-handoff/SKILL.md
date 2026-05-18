@@ -4,7 +4,7 @@ description: >
   This skill should be used when the user returns after performing
   remote git operations (push, release publish), asks "what should
   I do next" after a task completes, reports CI failure after pushing,
-  says things like "I pushed", "CI failed", "已推送", "CI挂了",
+  says things like "I pushed", "CI failed", "already pushed", "CI broke",
   or needs guidance on maintaining harness integrity after the agent
   has merged a task to main locally. Also trigger when the user comes
   back after a break and asks to resume work, check project state,
@@ -36,15 +36,28 @@ a completion summary. Present the appropriate remote sync commands.
 
 ### After a task completes (default)
 
-The agent has already merged to main. The user only needs to sync
-with remote:
+The agent has already merged to main. Present the output in this
+order: summary → verification → push.
 
 ```
 ✅ Task merged to main locally.
 
+Verify the changes:
+  git diff HEAD~1                    # review what changed
+  {build_command}                    # confirm build passes
+  {inspect_command}                  # visually inspect the result
+
 Sync to remote:
   git push origin main
 ```
+
+Replace `{build_command}` and `{inspect_command}` with the project's
+real commands. Every verification command must be runnable as-is.
+Tailor to what the task actually changed:
+- Visual change → include dev server URL or page path
+- API change → include a curl or test command
+- Config change → include a way to confirm the config loads
+- Test change → include the specific test suite command
 
 If the project accumulates multiple tasks before pushing, all
 merged commits go up in one push.
@@ -57,6 +70,11 @@ on the feature branch but does not merge. Then present:
 
 ```
 Task committed on branch {type}/{name}.
+
+Verify the changes:
+  git diff main..HEAD               # review what changed
+  {build_command}                    # confirm build passes
+  {inspect_command}                  # visually inspect the result
 
 Your next steps:
   git push origin {type}/{name}
@@ -90,16 +108,27 @@ Hotfixes follow the same auto-merge flow. After merge:
 ```
 Hotfix merged to main locally.
 
+Verify the fix:
+  git diff HEAD~1                    # review what changed
+  {build_command}                    # confirm build passes
+  {test_or_inspect_command}          # confirm the fix works
+
 Sync to remote:
   git push origin main
 
 Consider an immediate patch release:
-  Tell the agent: "发版" or "release a patch"
+  Tell the agent: "release a patch" or "ship the hotfix"
 ```
 
 ### Presentation rules
 
-- Include only the commands relevant to the current scenario.
+- Always present in this order: task summary → verify → push.
+- Verification commands must be real, runnable commands from the
+  project's actual toolchain. Never use placeholder commands.
+- Include at minimum: a diff command, a build/test command, and a
+  way to inspect the result (dev server, open file, run CLI).
+- Tailor verification to what the task actually changed.
+- Include only the git commands relevant to the current scenario.
 - Use actual branch names, commit types, and version numbers.
 - Do not explain what each command does unless the user asks.
 - End with a brief note on what to tell the agent next.
@@ -134,11 +163,11 @@ context from project state rather than asking the user to report.
 
 | User says | Agent does |
 |---|---|
-| "继续" / "resume" / "where was I" | Run context recovery, summarize state |
-| "已推送" / "I pushed" | Acknowledge, verify remote sync, ready for next task |
-| "CI挂了" / "CI failed" + error info | Treat as a fix task, enter `prompt-gateway` |
-| "发版" / "release" / "ship it" | Delegate to `versioning-and-changelog` Flow 2 |
-| "项目状态" / "check status" / "what's pending" | Run full context recovery, present summary |
+| "resume" / "continue" / "where was I" | Run context recovery, summarize state |
+| "I pushed" / "already pushed" | Acknowledge, verify remote sync, ready for next task |
+| "CI failed" / "CI broke" + error info | Treat as a fix task, enter `prompt-gateway` |
+| "release" / "ship it" / "cut a release" | Delegate to `versioning-and-changelog` Flow 2 |
+| "check status" / "project status" / "what's pending" | Run full context recovery, present summary |
 
 ## Handling common gaps
 

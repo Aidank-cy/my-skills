@@ -202,6 +202,9 @@ git log --oneline -3
 │ CHANGELOG  [Unreleased] → {category}    │
 │ Rules    {Updated: +{N} rules | None}   │
 │ Tests    {N passed, N added}            │
+│ Verify   git diff HEAD~1                │
+│          {build_command}                │
+│          {inspect_command}              │
 │ Merged   ✅ to main                     │
 └─────────────────────────────────────────┘
 
