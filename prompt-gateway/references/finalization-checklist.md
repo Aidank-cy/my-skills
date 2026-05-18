@@ -1,25 +1,27 @@
 # Finalization Checklist Reference
 
-This file details the automated closing sequence (Step 5) in granular detail.
+Detailed rules for the finalization sequence (Step 6) in the
+task-based pipeline.
 
 ---
 
 ## Pre-finalization gate
 
-Before entering the finalization sequence, ALL of these must be true:
+Before entering Step 6, ALL of these must be true:
 
-- [ ] All acceptance criteria from the spec are met
+- [ ] All subtasks from the decomposition are marked complete
 - [ ] Lint passes with zero errors
 - [ ] Typecheck passes (if applicable)
 - [ ] Tests pass (existing + any new ones)
 - [ ] No files outside of scope were modified
 - [ ] No new dependencies were added without spec authorization
+- [ ] Am I on a feature branch (not main)?
 
-If any fail, **do not enter finalization**. Fix or report to user.
+If any fail, fix or report to user before entering finalization.
 
 ---
 
-## 5A: CHANGELOG update rules
+## 6A: CHANGELOG update rules
 
 ### Mapping task type to changelog category
 
@@ -45,25 +47,19 @@ Each entry is a single line, human-readable, present tense:
 Rules:
 - Start with a verb (Add, Fix, Remove, Update, Change, Deprecate)
 - Include issue/PR number if available
-- One entry per logical change (not per file)
+- One entry per task (or per logical change if multi-commit)
 - No implementation details (don't say "modify auth.ts line 42")
 
 ### Insertion logic
 
 ```bash
-# Find the [Unreleased] section and insert after the appropriate category header
-# If the category header doesn't exist yet, create it
-
-# Example: Adding a "Fixed" entry
 CHANGELOG="CHANGELOG.md"
 CATEGORY="### Fixed"
 ENTRY="- Fix infinite redirect loop on expired JWT sessions (#42)"
 
 if grep -q "$CATEGORY" <(sed -n '/## \[Unreleased\]/,/## \[/p' "$CHANGELOG"); then
-  # Category exists — append under it
   sed -i "/$CATEGORY/a $ENTRY" "$CHANGELOG"
 else
-  # Category doesn't exist — add it under [Unreleased]
   sed -i "/## \[Unreleased\]/a \\
 \\
 $CATEGORY\\
@@ -73,14 +69,14 @@ fi
 
 ---
 
-## 5B: Rules file update decision tree
+## 6B: Rules file update decision tree
 
 ```
 Did execution reveal a new pattern or failure mode?
 ├── YES → Is it project-wide (affects all future tasks)?
 │   ├── YES → Add to AGENTS.md with [NEW] tag
 │   └── NO → Is it module-specific?
-│       ├── YES → Add to relevant .cursor/rules/ or skill file
+│       ├── YES → Add to relevant rules or skill file
 │       └── NO → Log in .harness/progress.md as observation
 └── NO → Skip rules update
 ```
@@ -89,8 +85,8 @@ Did execution reveal a new pattern or failure mode?
 
 | Observation | Rule to add |
 |-------------|-------------|
-| "I discovered the project uses a custom logger, not console.log" | `[NEW] Use src/lib/logger.ts for all logging, never console.log` |
-| "The API always returns wrapped responses via responseHelper" | `[NEW] All API responses use src/utils/responseHelper.ts` |
+| "Project uses a custom logger, not console.log" | `[NEW] Use src/lib/logger.ts for all logging, never console.log` |
+| "API always returns wrapped responses via responseHelper" | `[NEW] All API responses use src/utils/responseHelper.ts` |
 | "Tests must use the factory pattern in tests/factories/" | `[NEW] Create test data using factories in tests/factories/, never inline` |
 | "I was tempted to modify an adjacent module" | No rule needed — AGENTS.md already says "stay in scope" |
 
@@ -102,28 +98,31 @@ Did execution reveal a new pattern or failure mode?
 - [NEW] Use ResponseHelper for all API responses — never raw res.json()
 ```
 
-The `[NEW]` tag tells the user: "I added this during task execution. Review it."
-
 ---
 
-## 5C: Progress state format
+## 6C: Progress state format
 
 ```markdown
-## {YYYY-MM-DD} — {Task title from spec}
+## {YYYY-MM-DD} — {Task title}
 - **Status:** Complete | Partial (reason) | Blocked (reason)
+- **Branch:** {type}/{short-description}
+- **Subtasks:**
+  - ✅ 1. {subtask description}
+  - ✅ 2. {subtask description}
+  - ✅ 3. {subtask description}
 - **Commit:** {short hash} — {commit message first line}
 - **Changes:** {1-2 sentence summary}
 - **CHANGELOG:** {category}: {entry text}
 - **Rules updated:** {Yes: what was added | No}
+- **Merged to main:** Yes
 - **Follow-ups:**
   - {Any out-of-scope items discovered}
   - {Any tech debt noted}
-  - {Any related tasks suggested}
 ```
 
 ---
 
-## 5D: Commit message format
+## 6D: Commit message format
 
 ### Structure
 
@@ -147,51 +146,64 @@ The `[NEW]` tag tells the user: "I added this during task execution. Review it."
 | Build/tooling/config changes | `chore` |
 | Breaks backward compatibility | `feat!:` or `fix!:` |
 
-### Scope (optional, from spec's ## Scope)
+### Scope (optional, from task context)
 
-If the spec targets a specific module, use it as scope:
+If the task targets a specific module, use it as scope:
 - `feat(auth): add JWT refresh on expiry`
 - `fix(settings): resolve dark mode persistence issue`
 
 ### Examples
 
 ```bash
-# Simple feature
+# Single-subtask task
 git commit -m "feat: add dark mode toggle to settings page"
 
-# Bug fix with issue reference
-git commit -m "fix(auth): resolve infinite redirect on expired JWT
+# Multi-subtask task (single commit)
+git commit -m "feat(auth): add JWT refresh with token rotation
 
-Clear expired tokens before redirecting to /login.
-Store intended destination for post-login redirect.
+Add refresh token endpoint and automatic token rotation.
+Update auth middleware to handle expired access tokens.
+Add tests for token refresh flow.
 
 Closes #42"
 
 # Breaking change
 git commit -m "feat!(api): change response envelope format
 
-All API responses now use { data, error, meta } envelope.
-Previous { result, status } format is no longer supported.
-
-BREAKING CHANGE: API response format changed."
+BREAKING CHANGE: API response format changed from
+{ result, status } to { data, error, meta }."
 ```
 
 ---
 
-## 5E: Summary output template
+## 6E: Merge and summary output template
+
+### Merge protocol
+
+```bash
+git checkout main
+git merge {feature-branch} --no-ff
+git branch -d {feature-branch}
+git status --short
+git log --oneline -3
+```
+
+### Output template
 
 ```
-✅ Task complete and committed locally.
+✅ Task complete. Merged to main.
 
 ┌─────────────────────────────────────────┐
+│ Task     {task title}                   │
+│ Branch   {type}/{short-description}     │
 │ Commit   {short_hash} {first_line}      │
 │ Files    {N} changed                    │
+│ Subtasks {N}/{N} complete               │
 │ CHANGELOG  [Unreleased] → {category}    │
 │ Rules    {Updated: +{N} rules | None}   │
 │ Tests    {N passed, N added}            │
+│ Merged   ✅ to main                     │
 └─────────────────────────────────────────┘
 
-Remote operations (your call):
-  git push origin {branch}
-  gh pr create --title "{title}"
+Ready for next task.
 ```

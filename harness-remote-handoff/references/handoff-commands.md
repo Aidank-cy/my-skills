@@ -5,15 +5,55 @@ present the relevant block to the user at each boundary.
 
 ---
 
-## Feature development cycle
+## Task completion cycle (default — auto-merge)
 
-### After agent local commit → user pushes and opens PR
+### After task merged to main → user syncs remote
+
+```bash
+# Push all merged work to remote
+git push origin main
+```
+
+That's it. The feature branch was already merged and deleted
+locally by prompt-gateway Step 6E.
+
+### After multiple tasks → user syncs remote
+
+If the user completed several tasks before pushing:
+
+```bash
+# All merged commits go up in one push
+git push origin main
+
+# Verify
+git log --oneline origin/main..main
+# Should show 0 (local and remote are even)
+```
+
+### After task → user starts next task
+
+The user can say any of:
+- "Next task: {description}" — agent enters `prompt-gateway`
+- "What's pending?" — agent runs context recovery
+- Just describe the next change — agent treats it as a new task
+
+No explicit confirmation is needed between tasks. The agent
+verifies main is clean via the pre-task state gate.
+
+---
+
+## Task completion cycle (alternative — PR workflow)
+
+Use this path only when the user explicitly requests code review
+before remote merge.
+
+### Agent commits on feature branch → user pushes and opens PR
 
 ```bash
 # Push the feature branch
-git push origin feat/{name}
+git push origin {type}/{name}
 
-# Open PR (edit the body as needed)
+# Open PR
 gh pr create \
   --title "{type}: {subject}" \
   --body "## Summary
@@ -36,41 +76,29 @@ Closes #{issue}"
 ```bash
 git checkout main
 git pull origin main
-git branch -d feat/{name}
+git branch -d {type}/{name}
 
 # Optional: clean all merged branches
 git branch --merged main | grep -v 'main' | xargs -r git branch -d
 ```
 
-### After PR merged → user tells agent to start next task
+### PR review iteration → reviewer requests changes
 
-The user can say any of:
-- "Next task: {description}" — agent enters `prompt-gateway`
-- "What's pending?" — agent runs context recovery
-- Just describe the next feature — agent treats it as a new task
-
-No explicit "I merged" confirmation is needed. The agent detects
-the merge from `git log` when it reads project state.
-
----
-
-## PR review iteration cycle
-
-### Reviewer requests changes → user tells agent
+User tells agent:
 
 ```
-User: "Review says to change the toggle to a dropdown with
-       three options in src/components/ThemeToggle.tsx.
-       After the change, all three options switch themes correctly."
+"Review says to change the toggle to a dropdown with
+ three options in src/components/ThemeToggle.tsx.
+ After the change, all three options switch themes correctly."
 ```
 
 This is a valid Tier B prompt (what + where + done-when).
 The agent stays on the current branch and appends a commit.
 
-### After agent fixes → user pushes update
+After fix:
 
 ```bash
-git push origin feat/{name}
+git push origin {type}/{name}
 # PR updates automatically, re-request review
 ```
 
@@ -85,13 +113,13 @@ git push origin feat/{name}
 git push origin main --follow-tags
 ```
 
-### User wants a GitHub Release page too
+### User wants a GitHub Release page
 
 ```bash
 # Option 1: Notes from tag annotation
 gh release create v{x.y.z} --notes-from-tag
 
-# Option 2: Notes from CHANGELOG section (richer)
+# Option 2: Notes from CHANGELOG section
 gh release create v{x.y.z} \
   --notes "$(sed -n '/## \[{x.y.z}\]/,/## \[/p' CHANGELOG.md | sed '1d;$d')"
 
@@ -115,23 +143,17 @@ cat package.json | grep '"version"'
 
 ## Hotfix cycle
 
-### Agent commits hotfix → user pushes and fast-tracks PR
+### Agent merges hotfix to main → user pushes
 
 ```bash
-git push origin fix/{name}
-
-gh pr create \
-  --title "fix: {subject}" \
-  --body "## Hotfix
-{description}
-
-Closes #{issue}" \
-  --label "hotfix"
+# Hotfix already merged to main locally
+git push origin main
 ```
 
-### After hotfix merged → immediate patch release
+### Immediate patch release after hotfix
 
 User tells agent:
+
 ```
 "发版" / "release a patch" / "ship the hotfix"
 ```
@@ -146,6 +168,7 @@ Agent runs `versioning-and-changelog` Flow 2, which detects only
 ### User reports CI failure → agent fixes
 
 User provides:
+
 ```
 "CI failed: test-e2e, error: TypeError Cannot read property
 'theme' of undefined at tests/e2e/settings.spec.ts:42.
@@ -157,13 +180,13 @@ Agent treats as Tier B:
 - **Where**: tests/e2e/settings.spec.ts:42
 - **Done-when**: test-e2e passes
 
-After fix, agent commits and returns push command.
+Agent creates a fix task: branch → fix → commit → merge to main.
 
-### User pushes CI fix
+### User pushes the fix
 
 ```bash
-git push origin feat/{name}
-# CI re-runs automatically on PR
+git push origin main
+# CI re-runs on remote
 ```
 
 ---
@@ -185,15 +208,16 @@ git status --short
 # Recent tags
 git tag --sort=-v:refname | head -3
 
-# Remote tracking status
-git rev-list --left-right --count HEAD...origin/$(git branch --show-current) 2>/dev/null
+# Local vs remote status
+git fetch origin 2>/dev/null
+git rev-list --left-right --count HEAD...origin/main 2>/dev/null
 
 # Read harness state
-cat .harness/progress.md 2>/dev/null | tail -20
+tail -20 .harness/progress.md 2>/dev/null
 head -30 CHANGELOG.md 2>/dev/null
 ```
 
-### User-side recovery (when the user wants to check state manually)
+### User-side recovery (manual state check)
 
 ```bash
 # What branch am I on?
@@ -214,14 +238,30 @@ git fetch origin && git status
 
 ---
 
+## Interrupted session recovery
+
+### Feature branch left open from previous session
+
+```bash
+# Option A: Work is complete — merge it
+git checkout main
+git merge {branch} --no-ff
+git branch -d {branch}
+
+# Option B: Work is incomplete — resume
+git checkout {branch}
+# Continue through prompt-gateway pipeline
+
+# Option C: Work is abandoned — discard
+git checkout main
+git branch -D {branch}
+```
+
+---
+
 ## Multi-project context switch
 
-When the user works on multiple harness-managed projects and
-switches between them, the agent should:
-
-1. Detect the project change from the working directory or user statement.
-2. Run full context recovery for the new project.
-3. Not carry over state assumptions from the previous project.
+When the user switches between harness-managed projects:
 
 User says:
 ```
@@ -230,25 +270,23 @@ User says:
 
 Agent runs recovery procedure against the new project's
 `.harness/progress.md`, `CHANGELOG.md`, `AGENTS.md`, and git state.
+Do not carry over state assumptions from the previous project.
 
 ---
 
 ## Sync-filter integration
 
-When the project uses dev→public sync, remind the user after
-operations that touch the sync boundary:
+### After pushing main (with dev→public sync)
+
+```
+The sync workflow will run on push. Verify:
+  - Public repo does not contain harness files
+  - Public repo has the latest app source
+```
 
 ### After adding new harness files
 
 ```
 Note: {file} is classified as PRIVATE.
 Verify sync-public.yml includes: rm -rf {file}
-```
-
-### After release push
-
-```
-The sync workflow will run on push. Verify:
-  - Public repo does not contain harness files
-  - Public repo has the latest app source
 ```
