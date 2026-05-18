@@ -4,6 +4,51 @@ A personal user-level skill library for AI coding agents.
 
 These skills are designed to work across multiple projects as user-level configurations — they are not copied into individual project repositories. They follow the [open agent-skill standard](https://docs.claude.com/en/docs/agents-and-tools/agent-skills/best-practices) and are compatible with Claude Code, Cursor, Codex, and other skill-aware tools.
 
+## How it works
+
+Every code change follows a **task-based lifecycle**: one prompt = one task = one branch.
+
+```
+User prompt ("add feature X", "fix bug Y")
+  │
+  ▼
+prompt-gateway
+  ├─ Validate prompt structure
+  ├─ Decompose into task + subtasks
+  ├─ git checkout -b {type}/{name} from main
+  ├─ Execute subtasks one by one
+  ├─ Verify all subtasks
+  │
+  ├─► versioning-and-changelog ── update CHANGELOG.md
+  ├─► git-workflow ── commit with Conventional Commits
+  │
+  ├─ git merge to main
+  ├─ Delete feature branch
+  │
+  ▼
+✅ Done. On main. Ready for next task.
+  │
+  ▼
+harness-remote-handoff ── user pushes main to remote
+```
+
+Release flow:
+
+```
+User says "发版" / "release"
+  │
+  ▼
+versioning-and-changelog ── review unreleased entries
+                            compute SemVer bump
+                            update version files
+  │
+  ▼
+git-workflow ── release commit + tag
+  │
+  ▼
+harness-remote-handoff ── user pushes with --follow-tags
+```
+
 ## Skills
 
 ### Harness Engineering (project lifecycle)
@@ -15,12 +60,12 @@ These skills are designed to work across multiple projects as user-level configu
 
 ### Development Pipeline
 
-| Skill                                                 | What it does                                                                                                                                                                   |
-| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [prompt-gateway](prompt-gateway/)                     | Gate every code-modification task through structured validation (Tier A full spec / Tier B lightweight spec), orchestrate execution, and enforce CHANGELOG + commit discipline |
-| [versioning-and-changelog](versioning-and-changelog/) | Manage CHANGELOG.md entries after every change, compute SemVer bumps, and cut releases with proper tagging                                                                     |
-| [git-workflow](git-workflow/)                         | Standardize branch naming, Conventional Commits format, PR conventions, merge strategy, and release git mechanics                                                              |
-| [harness-remote-handoff](harness-remote-handoff/)     | Bridge the gap between agent-managed local commits and user-owned remote operations (push, PR, merge), with context recovery when the user returns                             |
+| Skill                                                 | What it does                                                                                                                                                                                                     |
+| ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [prompt-gateway](prompt-gateway/)                     | Gate every code-modification prompt through structured validation, decompose into task + subtasks, orchestrate execution on a feature branch, enforce CHANGELOG + commit discipline, and auto-merge back to main |
+| [versioning-and-changelog](versioning-and-changelog/) | Manage CHANGELOG.md entries after every task, compute SemVer bumps, and cut releases with proper tagging                                                                                                         |
+| [git-workflow](git-workflow/)                         | Standardize the task-based branch lifecycle (branch → subtasks → commit → merge), Conventional Commits format, merge strategy, and release git mechanics                                                         |
+| [harness-remote-handoff](harness-remote-handoff/)     | Bridge the gap between agent-managed local work (including auto-merge to main) and user-owned remote operations (push), with context recovery when the user returns                                              |
 
 ### Tooling
 
@@ -29,45 +74,25 @@ These skills are designed to work across multiple projects as user-level configu
 | [sync-filter](sync-filter/)         | Classify files as private or public for dev→public repo sync pipelines, ensuring harness files never leak to the public mirror      |
 | [skill-authoring](skill-authoring/) | Write, review, and refactor skills following the open standard — naming, progressive disclosure, description quality, and structure |
 
-## How they work together
+## Task lifecycle detail
 
-```
-User request
-  │
-  ▼
-prompt-gateway ─── validates prompt structure
-  │                 checks harness integrity
-  │                 builds execution plan
-  │                 executes and verifies
-  │
-  ├─► versioning-and-changelog ─── updates CHANGELOG.md
-  │
-  ├─► git-workflow ─── commit format, branch conventions
-  │
-  ▼
-Local commit (agent boundary)
-  │
-  ▼
-harness-remote-handoff ─── guides user through push / PR / merge
-                           recovers context on return
-```
+Each user prompt goes through this pipeline:
 
-Release flow:
+| Step        | What happens                                                                          |
+| ----------- | ------------------------------------------------------------------------------------- |
+| **Step 0**  | Branch state gate — ensure on main, create `{type}/{name}` branch                     |
+| **Step 1**  | Classify — code change vs read-only vs release vs harness setup                       |
+| **Step 2**  | Validate prompt (Tier A full spec / Tier B lightweight spec), decompose into subtasks |
+| **Step 3**  | Harness integrity check — verify AGENTS.md, CHANGELOG.md, .harness/ exist             |
+| **Step 4**  | Build execution plan with impact level and subtask breakdown                          |
+| **Step 5**  | Execute subtasks sequentially, verify each one                                        |
+| **Step 6A** | CHANGELOG update via `versioning-and-changelog`                                       |
+| **Step 6B** | Rules update if needed (AGENTS.md, CLAUDE.md)                                         |
+| **Step 6C** | Progress update in `.harness/progress.md`                                             |
+| **Step 6D** | Conventional commit                                                                   |
+| **Step 6E** | Merge to main, delete branch                                                          |
 
-```
-User says "发版" / "release"
-  │
-  ▼
-versioning-and-changelog ─── reviews unreleased entries
-                             computes SemVer bump
-                             updates version files
-  │
-  ▼
-git-workflow ─── release commit + tag
-  │
-  ▼
-harness-remote-handoff ─── user pushes with --follow-tags
-```
+After Step 6E, the project is on main and the user can either start the next task or push to remote.
 
 ## Skill anatomy
 
