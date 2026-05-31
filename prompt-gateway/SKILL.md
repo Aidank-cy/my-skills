@@ -195,6 +195,23 @@ Execution rules:
 After all subtasks pass, run a final full verification:
 lint + typecheck + tests + acceptance criteria.
 
+### Plan alignment check
+
+After all subtasks pass technical verification, confirm architectural alignment:
+
+```
+□ Did the implementation reuse existing patterns and abstractions
+  found in the codebase, rather than creating new ones?
+□ Does the implementation stay within the file and module scope
+  defined in Step 4's plan?
+□ If new files were created, do they follow the project's
+  established directory and naming conventions?
+□ Were any lint-disable or noqa comments added? If so, remove them
+  and fix the underlying violation.
+```
+
+If any check fails, fix before proceeding to Step 6.
+
 ## Step 6: Finalize
 
 Non-negotiable. Do not return to the user before completing all
@@ -241,6 +258,21 @@ Follow `git-workflow` commit format.
 If the task has genuinely independent logical changes that warrant
 separate commits, create one commit per logical change, each
 independently passing all checks.
+
+### 6D-alt: Sandbox mode (Codex or restricted environments)
+
+When running in a sandboxed environment without direct git commit/push
+access:
+
+1. Stage all changes: `git add -A`
+2. Write the proposed commit message to `.harness/pending-commit.md`
+   using `git-workflow` commit conventions.
+3. Present the full diff summary and proposed commit message.
+4. Skip Steps 6D and 6E — the user owns commit and merge.
+
+Detection: if `git commit` fails with a permissions or sandbox error,
+or if the user has indicated Codex/sandbox mode, use this path
+automatically.
 
 ### 6E: Merge to main
 
@@ -294,6 +326,19 @@ Present the git push command(s) per `harness-remote-handoff`.
 
 The project is now on main, ready for the next task.
 
+### 6F: Project-level Always obligations
+
+Regardless of task-scoped restrictions, always complete these
+before finishing:
+
+1. Update `CHANGELOG.md` under `[Unreleased]` with a summary
+   of what this task changed.
+2. Update `.harness/progress.md` "Recent" section with the
+   completed work.
+
+These obligations cannot be overridden by task-level "out of scope"
+declarations.
+
 ## Task lifecycle summary
 
 ```
@@ -309,8 +354,9 @@ The project is now on main, ready for the next task.
 │  Step 6A: CHANGELOG                              │
 │  Step 6B: Rules (if needed)                      │
 │  Step 6C: Progress                               │
-│  Step 6D: Commit                                 │
+│  Step 6D: Commit or 6D-alt sandbox handoff       │
 │  Step 6E: Merge to main → delete branch          │
+│  Step 6F: Project-level Always obligations       │
 │    ↓                                             │
 │  ✅ Done. Ready for next task.                    │
 └─────────────────────────────────────────────────┘
@@ -338,6 +384,12 @@ Reject these shortcuts:
 - Adding task B's changes to task A's branch
 - Skipping the merge-to-main step
 - Committing directly on main
+- Skipping sandbox mode detection when git operations fail
+- Letting a task-scoped "out of scope" declaration override
+  project-level Always rules. CHANGELOG.md and progress.md updates
+  are Always obligations — a task prompt cannot exempt them.
+- Keeping rules that have never been triggered by a real failure
+- Treating skill file count or word count as a quality signal
 
 ## References
 

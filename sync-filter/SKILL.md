@@ -162,6 +162,15 @@ If PRIVATE → update sync-public.yml in same commit
 If PUBLIC  → no action needed
 ```
 
+## Anti-rationalization
+
+Reject these shortcuts:
+- Classifying uncertain files as public to avoid extra work
+- Updating private files without updating the sync workflow
+- Treating a successful push as proof that private files were stripped
+- Keeping rules that have never been triggered by a real failure
+- Treating skill file count or word count as a quality signal
+
 ## References
 
 Read on demand — do not load all by default.

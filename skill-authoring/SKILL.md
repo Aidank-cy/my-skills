@@ -167,6 +167,15 @@ When asked to improve an existing skill:
 | Nested references (A→B→C) | Flatten to one level from SKILL.md |
 | Explaining what the model knows | Cut it — every token competes for context |
 
+## Anti-rationalization
+
+Reject these shortcuts:
+- Adding rules without a concrete trigger or failure mode
+- Keeping detailed scenario content in SKILL.md when a reference would do
+- Treating a longer skill as a more complete skill
+- Keeping rules that have never been triggered by a real failure
+- Treating skill file count or word count as a quality signal
+
 ## References
 
 | When | Read |

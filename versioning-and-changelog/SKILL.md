@@ -183,6 +183,8 @@ Reject these shortcuts:
 - cutting a release without a tag
 - bumping a version without reviewing unreleased changes
 - leaving version files and tags out of sync
+- Keeping rules that have never been triggered by a real failure
+- Treating skill file count or word count as a quality signal
 
 ## References
 

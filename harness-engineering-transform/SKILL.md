@@ -125,14 +125,9 @@ For the full scaffold matrix, read `references/generated-artifacts.md`.
 
 Generate content that fits the real codebase.
 
-### AGENTS.md
-
-Generate `AGENTS.md` with these standards:
-- 60 lines or fewer
-- real commands for install, test, lint, build, and dev when applicable
-- three-tier boundaries: `Always`, `Ask first`, `Never`
-- concrete architecture and pattern guidance
-- `[INFERRED]` markers on rules that come from inferred failure modes
+For AGENTS.md generation standards, verification requirements, and
+design principles, read
+`../harness-init/references/shared-generation-standards.md`.
 
 ### Harness templates and scripts
 
@@ -166,14 +161,9 @@ For examples of useful domain skills, read `references/component-catalog.md`.
 
 ## Verification
 
-Before finishing, confirm all of the following:
-- `AGENTS.md` is short and contains real commands
-- inferred rules are labeled
-- `CHANGELOG.md` exists and matches the repo's version history state
-- templates and hooks reference real project commands
-- generated skills match the project's real domains
-- generated files do not point to nonexistent tools or paths
-- executable scripts received executable permissions
+Before finishing, apply the shared verification checklist. Also confirm
+that transform-specific artifacts are justified by the audit and do not
+duplicate existing project configuration.
 
 ## User handoff
 
@@ -184,16 +174,6 @@ Brief the user on these priorities:
 - use `CHANGELOG.md` continuously, not only at release time
 - ratchet new rules and hooks in response to actual mistakes
 
-## Principles
-
-Apply these principles during generation:
-- use the ratchet principle
-- distinguish probabilistic guidance from deterministic enforcement
-- prefer progressive disclosure over loading everything at once
-- keep context small and structured
-- separate generation from evaluation when reviewer personas are available
-- keep the output model-agnostic whenever possible
-
 ## Anti-rationalization
 
 Reject these shortcuts:
@@ -203,6 +183,8 @@ Reject these shortcuts:
 - writing AGENTS guidance with vague statements instead of commands
 - treating hooks or CI as optional when they enforce critical constraints
 - copying generic templates without tailoring them to the actual repo
+- Keeping rules that have never been triggered by a real failure
+- Treating skill file count or word count as a quality signal
 
 ## References
 
@@ -211,3 +193,4 @@ Reject these shortcuts:
 | Need stack-specific commands, heuristics, or audit hints | `references/tech-stack-reference.md` |
 | Need examples of domain skills and harness components | `references/component-catalog.md` |
 | Need the full scaffold matrix and generation templates | `references/generated-artifacts.md` |
+| Need AGENTS.md standards, verification requirements, or design principles | `../harness-init/references/shared-generation-standards.md` |

@@ -1,4 +1,4 @@
-# CLAUDE.md
+# AGENTS.md
 
 ## Language rule
 
@@ -111,3 +111,7 @@ English.
   must be in English regardless of user input language.
 - If the user communicates in Chinese, respond in English but
   acknowledge understanding of their request.
+- Audit skill anti-rationalization sections every 3+ phases.
+  Remove entries that have never been triggered by a real failure.
+- When a skill exceeds the 500-line / 3000-word budget, refactor
+  before adding new content.

@@ -88,13 +88,8 @@ Core pipeline skills (`prompt-gateway`, `versioning-and-changelog`,
 `git-workflow`, `skill-authoring`, `sync-filter`) are user-level.
 Do not duplicate them into the project's `skills/` directory.
 
-Use these generation rules:
-- generate `AGENTS.md` with real commands and a three-tier boundary model
-- mark inferred startup rules with `[INITIAL]`
-- generate `CHANGELOG.md` with Keep a Changelog structure
-- create project-specific domain skills in `skills/` only when the codebase justifies them (2+ distinct domains, complex API, database layer, etc.)
-- tailor hooks and CI to the actual toolchain
-- generate at least one example file when the project would otherwise have no pattern reference
+For AGENTS.md generation standards, verification requirements, and
+design principles, read `references/shared-generation-standards.md`.
 
 For the full scaffold layout and generation matrix, read `references/bootstrap-layout.md`.
 For file content templates, read `references/file-templates.md`.
@@ -119,15 +114,6 @@ Explain these priorities:
 - use `.harness/progress.md` as cross-session memory
 - ratchet new rules or hooks in response to real failures
 
-## Generation standards
-
-Follow these standards for the scaffold:
-- keep `AGENTS.md` at or below 60 lines
-- use real commands, not descriptions
-- prefer cross-tool-compatible core content
-- keep rules traceable and minimal
-- generate only the files the project shape actually needs
-
 ## Relationship to transform
 
 Use `harness-init` for new projects.
@@ -142,10 +128,13 @@ Reject these shortcuts:
 - writing vague AGENTS rules with no runnable commands
 - skipping hooks or CI because the scaffold is "only initial"
 - leaving the project without a concrete example pattern
+- Keeping rules that have never been triggered by a real failure
+- Treating skill file count or word count as a quality signal
 
 ## References
 
 | When needed | Read |
 |-------------|------|
+| Need AGENTS.md standards, verification requirements, or design principles | `references/shared-generation-standards.md` |
 | Need the full scaffold layout, optional file matrix, or post-generation checklist | `references/bootstrap-layout.md` |
 | Need the concrete file templates to generate | `references/file-templates.md` |

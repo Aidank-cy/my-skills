@@ -101,3 +101,51 @@ description: Helps with hooks.
 description: Use this when you need hook help.
 description: Load when user needs guidance.
 ```
+
+## Anti-patterns in real skills
+
+### Anti-pattern: Monolithic SKILL.md
+
+Symptom: SKILL.md exceeds 3000 words or 500 lines.
+Example: A 319-line handoff skill that inlines every scenario.
+Fix: Extract scenario-specific content to `references/`, keep
+only decision logic and core workflow in SKILL.md.
+
+### Anti-pattern: Duplicated content across skills
+
+Symptom: Two skills share 40%+ identical paragraphs.
+Example: init and transform skills duplicating AGENTS.md generation rules.
+Fix: Extract shared content into a common reference file. One skill
+owns the file, the other points to it via relative path.
+
+### Anti-pattern: Missing decay mechanism
+
+Symptom: Anti-rationalization section only adds constraints, never removes.
+Example: Rules accumulate across sessions but are never audited for relevance.
+Fix: Add explicit decay rules. Review anti-rationalization entries every
+3+ phases; remove any that have never been triggered.
+
+### Anti-pattern: Thin reference files
+
+Symptom: A reference file exists but contains less useful content than
+the SKILL.md body that points to it.
+Fix: Either merge the content back into SKILL.md (if total stays under
+budget) or expand the reference with concrete examples and templates.
+
+### Anti-pattern: No agent-profile adaptation
+
+Symptom: Skill assumes a single execution environment.
+Example: git-workflow assumes full git access but Codex runs in a sandbox.
+Fix: Add conditional branches for different agent capabilities.
+Detect environment constraints and adapt the workflow automatically.
+
+### Anti-pattern: Task prompt overrides project-level Always rules
+
+Symptom: A task-scoped Codex prompt says "Do NOT modify CHANGELOG.md"
+and the agent obeys, even though AGENTS.md says "Always update
+CHANGELOG after completed work."
+Example: Refactoring task marks harness files as out-of-scope;
+agent finishes without changelog or progress entry.
+Fix: In the prompt-gateway skill, add a final step (6F) that lists
+project-level Always obligations that cannot be overridden by
+task-level scope restrictions. Add matching anti-rationalization.

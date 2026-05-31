@@ -275,6 +275,8 @@ Reject these shortcuts:
 - Creating a PR without a CHANGELOG entry
 - Adding task B commits to task A's branch
 - Deferring merge-to-main "to batch tasks together"
+- Keeping rules that have never been triggered by a real failure
+- Treating skill file count or word count as a quality signal
 
 ## References
 
