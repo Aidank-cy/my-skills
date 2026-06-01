@@ -19,11 +19,13 @@ This file contains all templates for generating harness engineering files in a n
 - Lint: `{real lint command}`
 - Typecheck: `{real typecheck command if applicable}`
 - Build: `{real build command}`
+- Post-task verify: `./hooks/post-task-verify.sh`
 
 ## Always
 - Run `{lint}` and `{typecheck}` after every file edit. Fix failures before proceeding.
 - Write tests for new functionality. Run the full suite before declaring done.
 - Commit after each meaningful unit of work. Use conventional commits: `feat:`, `fix:`, `refactor:`, `test:`, `docs:`.
+- Run `./hooks/post-task-verify.sh` after completing each task. Fix all errors before reporting done.
 - New {components/modules/routes} follow the pattern in `{example path}`. [INITIAL]
 - {stack-specific convention, e.g. "Use path aliases via @/ for imports"} [INITIAL]
 
@@ -196,21 +198,49 @@ grep -rn "^pub " "$MODULE_PATH"/*.rs 2>/dev/null
 ## .harness/progress.md (starts empty)
 
 ```markdown
-## Session progress
+## Current state
+- Latest release: (none)
+- Completed: (none)
+- In progress: (none)
+- Next session should: (pending first task)
 
-_This file is read at the start of each agent session and updated at the end. It is the primary mechanism for cross-session state persistence._
-
-### Completed
+## Recent (last 3 sub-features only)
 (none yet)
 
-### In progress
-(none yet)
+## Archive
+Full history: `.harness/archive/completed-phases.md`
+```
 
-### Decisions made
-(none yet)
+**progress.md rules:**
+- This file must never exceed 50 lines.
+- When a phase or milestone is completed, move its detailed entries
+  to `.harness/archive/completed-phases.md` and leave only a one-line
+  summary in the "Completed" list above.
+- The "Recent" section holds at most 3 entries. When a 4th is added,
+  archive the oldest.
+- Create `.harness/archive/` directory and an empty
+  `completed-phases.md` file during scaffold generation.
 
-### Next session should
-1. (pending first task)
+---
+
+## .harness/session-log.md
+
+```markdown
+# Session log
+
+Entries use timestamp + tool name as unique identifier.
+Do not use sequential session numbers — they collide when
+multiple agents work on the same project.
+
+Format per entry:
+
+## {YYYY-MM-DD}T{HH:MM}Z — {tool}
+**Phase:** {current phase or task}
+**Resuming from:** {what progress.md said to do next}
+**Completed:** {what was done}
+**Uncommitted work:** YES/NO
+**Rework:** YES/NO — {what was redone from a prior session, if any}
+**First-attempt success:** {N}/{M} subtasks passed on first try
 ```
 
 ---
@@ -417,6 +447,75 @@ if git diff --cached | grep -iE '(api_key|secret|password|token)\s*=\s*["\x27][^
   echo "ERROR: Possible hardcoded secret. Use environment variables."
   exit 1
 fi
+```
+
+---
+
+## hooks/post-task-verify.sh
+
+This hook is run by the agent (or user) at the end of each task
+to verify that all finalization obligations were met. Unlike
+post-file-edit.sh (which runs after each edit), this runs once
+per completed task.
+
+```bash
+#!/bin/bash
+set -euo pipefail
+
+# Gate 1: CHANGELOG was updated
+UNRELEASED=$(grep -c "## \[Unreleased\]" CHANGELOG.md 2>/dev/null || echo "0")
+if [ "$UNRELEASED" = "0" ]; then
+  echo "ERROR: CHANGELOG.md missing or has no [Unreleased] section."
+  echo "FIX: Update CHANGELOG.md under [Unreleased] with a summary of this task's changes."
+  exit 1
+fi
+
+LAST_CHANGELOG_COMMIT=$(git log -1 --format="%H" -- CHANGELOG.md 2>/dev/null || echo "none")
+LAST_ANY_COMMIT=$(git log -1 --format="%H" 2>/dev/null || echo "none")
+if [ "$LAST_CHANGELOG_COMMIT" != "$LAST_ANY_COMMIT" ]; then
+  echo "WARNING: CHANGELOG.md was not updated in the latest commit."
+  echo "FIX: Amend the commit or create a new commit with CHANGELOG updates."
+fi
+
+# Gate 2: progress.md was updated
+if [ -f .harness/progress.md ]; then
+  PROGRESS_LINES=$(wc -l < .harness/progress.md)
+  if [ "$PROGRESS_LINES" -gt 50 ]; then
+    echo "ERROR: .harness/progress.md exceeds 50 lines ($PROGRESS_LINES lines)."
+    echo "FIX: Archive completed phases to .harness/archive/completed-phases.md."
+    exit 1
+  fi
+fi
+
+# Gate 3: No uncommitted changes
+DIRTY=$(git status --short 2>/dev/null)
+if [ -n "$DIRTY" ]; then
+  echo "ERROR: Uncommitted changes detected:"
+  echo "$DIRTY"
+  echo "FIX: Stage and commit all changes, or stash unrelated work."
+  exit 1
+fi
+
+# Gate 4: Must be on main (task branch should be merged and deleted)
+BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
+if [ "$BRANCH" != "main" ]; then
+  echo "ERROR: Still on branch '$BRANCH'. Task branch was not merged."
+  echo "FIX: Merge to main and delete the task branch:"
+  echo "  git checkout main && git merge $BRANCH --no-ff && git branch -d $BRANCH"
+  exit 1
+fi
+
+# Gate 5: Audit trigger check
+if [ -f .harness/progress.md ]; then
+  COMPLETED_COUNT=$(grep -c "^- " .harness/progress.md 2>/dev/null || echo "0")
+  LAST_AUDIT=$(grep "Last audit:" .harness/progress.md 2>/dev/null | tail -1 || echo "")
+  if [ "$COMPLETED_COUNT" -gt 3 ] && [ -z "$LAST_AUDIT" ]; then
+    echo "NOTICE: 3+ phases completed since last audit."
+    echo "Consider running a periodic audit (see shared-generation-standards.md)."
+  fi
+fi
+
+echo "✅ Post-task verification passed."
 ```
 
 ---

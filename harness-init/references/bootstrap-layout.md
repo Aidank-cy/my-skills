@@ -12,6 +12,9 @@
 │   ├── plan-template.md
 │   ├── impact-map.sh
 │   ├── progress.md
+│   ├── archive/
+│   │   └── completed-phases.md
+│   ├── session-log.md
 │   └── anti-rationalization.md
 ├── skills/
 │   ├── using-skills/
@@ -26,7 +29,8 @@
 │   └── code-reviewer.md
 ├── hooks/
 │   ├── post-file-edit.sh
-│   └── pre-commit.sh
+│   ├── pre-commit.sh
+│   └── post-task-verify.sh
 ├── .github/workflows/
 │   └── ai-quality-gate.yml
 └── {standard project files}
