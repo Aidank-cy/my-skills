@@ -111,16 +111,20 @@ or 500 lines. Move anything beyond that to references/.
 
 - Over 300 lines: add a table of contents at the top.
 - Over 10,000 words: add grep search hints in the SKILL.md
-  pointer table so the agent can search efficiently:
+  pointer table so the agent can search efficiently.
 
-| When | Read |
-|------|------|
-| Need endpoint details | `references/api.md` (grep: "endpoint", "route") |
+  Example pointer table with grep hints (illustrative, not real files):
+
+  ```
+  | When | Read |
+  |------|------|
+  | Need endpoint details | reference-file-path (grep: "endpoint", "route") |
+  ```
 
 ### One level of references only
 
-SKILL.md → references/guide.md is fine.
-SKILL.md → references/guide.md → references/detail.md is not.
+One level deep is fine: SKILL.md points to a reference file.
+Nested references are not: SKILL.md → ref-A.md → ref-B.md.
 The agent may partially read nested files. Flatten to one level.
 
 ## Writing instructions
