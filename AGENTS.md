@@ -13,6 +13,15 @@ This applies to:
 - Progress updates in `.harness/progress.md`
 - All agent-generated content
 
+## Skill scope rules
+
+- `always-on/` skills are designed for user-level installation.
+  They must never reject or intercept casual conversation.
+- `project-pipeline/` skills require project context (AGENTS.md,
+  .harness/) to activate. Install per-project only.
+- `domain-skills/` skills are self-contained. Install at either
+  level based on preference.
+
 ## Chinese input trigger mapping
 
 When the user inputs Chinese that is semantically equivalent to a

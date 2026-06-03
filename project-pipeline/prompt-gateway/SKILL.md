@@ -1,17 +1,18 @@
 ---
 name: prompt-gateway
 description: >
-  This skill should be used when the user asks to add, modify, remove,
-  refactor, or fix project functionality, including prompts like "add
-  feature", "fix bug", "modify X", "implement Y", "add functionality",
-  "modify functionality", "new feature", "fix issue", "next change", "next feature", or any
-  code-change request. Route every code-modification prompt through
-  a task-based gate: decompose the prompt into a task with subtasks,
-  create a feature branch, execute all subtasks, verify, commit, and
-  merge back to main. Reject vague prompts with guidance. Treat
-  git-workflow and versioning-and-changelog as hard dependencies.
-  Do not use for questions, explanations, reviews, release-only tasks,
-  or other read-only work.
+  This skill should be used ONLY when working inside a project
+  directory that contains AGENTS.md or .harness/, AND the user asks
+  to add, modify, remove, refactor, or fix project functionality.
+  Trigger phrases: "add feature", "fix bug", "modify X", "implement Y",
+  "new feature", "fix issue", "next change", "next feature", or any
+  explicit code-change request targeting a specific project.
+  Do NOT trigger for: casual conversation, questions, explanations,
+  general chat, greetings, brainstorming, opinions, research,
+  discussions about tools or workflows, or any input that is not
+  an explicit code-modification request targeting a specific project.
+  If no project context is detected (no AGENTS.md, no .harness/,
+  no git repo), this skill does not apply.
 ---
 
 # Prompt Gateway
@@ -68,6 +69,27 @@ git checkout main
 git pull origin main
 git checkout -b {type}/{short-description}
 ```
+
+## Step 0.5: Conversation mode check
+
+Before classifying, determine if the user is in conversation mode
+or task mode.
+
+Conversation mode signals (skip this skill entirely):
+- No project directory context (no AGENTS.md, no .harness/)
+- Input is a question, greeting, opinion request, or discussion
+- Input does not reference specific files, modules, or code changes
+- Input is about workflow planning, tool comparison, or brainstorming
+- Input is in natural language without any code-change intent
+
+Task mode signals (proceed to Step 1):
+- User explicitly requests a code change with a target
+- Input references specific files, functions, or components to modify
+- Project context is present (AGENTS.md, .harness/, git repo)
+- Input matches Tier A or Tier B structure
+
+When in doubt, ask: "Are you asking me to make a code change,
+or are we just chatting?" Do not assume task mode.
 
 ## Step 1: Classify
 

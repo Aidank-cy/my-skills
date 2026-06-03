@@ -4,7 +4,7 @@ An agent-compatible plugin/skill package for auditing and improving the usabilit
 
 This package includes entrypoints for multiple agent runtimes:
 
-- **Codex / generic agent skill:** `skills/frontend-design-audit/SKILL.md`
+- **Codex / generic agent skill:** `SKILL.md`
 - **Codex plugin manifest:** `.codex-plugin/plugin.json`
 - **Legacy command plugin manifest:** `.claude-plugin/plugin.json`
 - **Legacy command files and skill:** `.claude/commands/` and `.claude/skills/`
@@ -52,16 +52,16 @@ frontend-design-audit/
   .claude/
     commands/
     skills/
-  skills/
-    frontend-design-audit/
-      SKILL.md
+  SKILL.md
   references/
     heuristics.md
     patterns.md
   examples/
 ```
 
-The `skills/frontend-design-audit/SKILL.md` entrypoint uses agent-neutral wording and generic tool guidance. The `.claude/` files are retained for command-compatible agent runtimes while using the same generic audit behavior.
+The root `SKILL.md` entrypoint uses agent-neutral wording and generic
+tool guidance. The `.claude/` files are retained for command-compatible
+agent runtimes while using the same generic audit behavior.
 
 ## Installation
 
@@ -70,7 +70,7 @@ The `skills/frontend-design-audit/SKILL.md` entrypoint uses agent-neutral wordin
 Use the plugin package from either location:
 
 ```text
-/Users/ninnnnk/my-skills/frontend-design-audit
+/Users/ninnnnk/my-skills/domain-skills/frontend-design-audit
 /Users/ninnnnk/.codex/plugins/frontend-design-audit
 ```
 
