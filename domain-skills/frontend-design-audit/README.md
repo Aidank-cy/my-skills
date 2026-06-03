@@ -43,6 +43,7 @@ Then it implements the fixes when the active agent has local source access: acce
 frontend-design-audit/
   SKILL.md
   references/
+    audit-workflow.md
     heuristics.md
     patterns.md
   examples/

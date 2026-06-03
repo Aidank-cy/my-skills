@@ -18,6 +18,13 @@ description: >
 Bootstrap a brand-new project with harness engineering from the start.
 Generate the standard project and the harness scaffold in one pass.
 
+## Conversation mode check
+
+Activate only when the user explicitly asks to initialize, scaffold,
+or create a project-level harness. Skip this skill for casual
+conversation, general project discussion, read-only questions, or
+requests that do not target a new or empty project.
+
 ## Core rules
 
 - Use this skill only for new or empty projects.

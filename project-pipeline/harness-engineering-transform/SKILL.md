@@ -17,6 +17,13 @@ description: >
 Transform an existing codebase into a harness-engineering-compliant project.
 Audit first, scaffold second, generate third.
 
+## Conversation mode check
+
+Activate only when the user explicitly asks to add harness engineering,
+agent rules, hooks, quality gates, or agent-ready structure to an
+existing project. Skip this skill for casual conversation, read-only
+questions, or requests with no project context.
+
 ## Core rules
 
 - Execute the workflow in order: audit, scaffold, generate.

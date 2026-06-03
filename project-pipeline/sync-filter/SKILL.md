@@ -17,6 +17,14 @@ Manage the boundary between a private dev repo and its public mirror.
 The sync workflow strips private files then force-pushes the clean
 result. Keep the workflow in sync with reality at all times.
 
+## Conversation mode check
+
+Activate only when the user explicitly asks about dev-to-public sync,
+file classification, sync credentials, branch protection, or sync
+pipeline debugging. Skip this skill for casual conversation, read-only
+questions unrelated to sync, or repositories with no private-to-public
+sync workflow.
+
 ## Naming convention
 
 Private repo = public repo name + `-dev` suffix.
