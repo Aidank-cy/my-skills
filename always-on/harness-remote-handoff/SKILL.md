@@ -10,7 +10,9 @@ description: >
   back after a break and asks to resume work, check project state,
   or confirm sync status. In the task-based workflow, the agent
   auto-merges to main after each task, so the handoff is primarily
-  about syncing local main with remote.
+  about syncing local main with remote. Do NOT trigger for casual
+  conversation, general questions, greetings, or topics unrelated to
+  project handoff or resumption.
 ---
 
 # Harness Remote Handoff
@@ -20,6 +22,18 @@ In the task-based workflow, the agent owns the full local cycle:
 branch → subtasks → commit → merge to main. The user owns remote
 operations. This skill governs the handoff after each task and the
 recovery path when the user returns.
+
+## Activation guard
+
+This skill activates only when:
+- The user explicitly mentions pushing, CI status, resuming work,
+  or returning to a project after a break, OR
+- The agent detects the user is inside a harness-managed project
+  directory (contains AGENTS.md or .harness/)
+
+If the user is having a casual conversation outside of any project
+context, this skill does not apply. Do not intercept non-project
+interactions.
 
 ## Core rules
 

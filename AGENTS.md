@@ -13,15 +13,6 @@ This applies to:
 - Progress updates in `.harness/progress.md`
 - All agent-generated content
 
-## Skill scope rules
-
-- `always-on/` skills are designed for user-level installation.
-  They must never reject or intercept casual conversation.
-- `project-pipeline/` skills require project context (AGENTS.md,
-  .harness/) to activate. Install per-project only.
-- `domain-skills/` skills are self-contained. Install at either
-  level based on preference.
-
 ## Chinese input trigger mapping
 
 When the user inputs Chinese that is semantically equivalent to a
@@ -62,6 +53,15 @@ English.
 | 更新版本 / 版本迭代 | "bump version" |
 | 打标签 / 打tag | "tag a release" |
 | 上线 | "ship it" |
+
+### bootstrap-project triggers
+
+| Chinese input | Maps to |
+|---|---|
+| 新项目 / 新建项目 | "new project" |
+| 创建项目 | "create a project" |
+| 开始一个项目 | "start a project" |
+| 初始化项目文件夹 | "init a project folder" |
 
 ### harness-init triggers
 
@@ -110,6 +110,47 @@ English.
 | 审查skill / 检查skill | "review a skill" |
 | 改进skill / 优化skill | "improve a skill" |
 | 重构SKILL.md | "refactor a SKILL.md" |
+
+## Skill scope rules
+
+Skills are organized into three activation scopes:
+
+### always-on/ — User-level skills
+
+Designed for permanent installation at `~/.codex/skills/`.
+These skills only activate on explicit, narrow triggers and must
+never reject or intercept casual conversation. Each has an
+activation guard section that defines when it applies.
+
+Currently: git-workflow, versioning-and-changelog,
+harness-remote-handoff, skill-authoring, bootstrap-project.
+
+### project-pipeline/ — Project-level skills
+
+Require project context (AGENTS.md, .harness/, git repo) to
+activate. Install per-project via symlinks created by
+bootstrap-project, not at user level. These skills act as
+gatekeepers that route and validate user input within a project.
+
+Currently: prompt-gateway, harness-init,
+harness-engineering-transform, sync-filter.
+
+### domain-skills/ — Standalone skills
+
+Self-contained, topic-specific skills that do not interact with
+the harness pipeline. Install at either user or project level
+based on preference.
+
+Currently: frontend-design-audit.
+
+### Adding new skills
+
+When adding a new skill, determine its scope:
+- Does it intercept or gate user input? → project-pipeline/
+- Does it need project context? → project-pipeline/
+- Could it reject casual chat? → project-pipeline/
+- Is it a standalone capability? → domain-skills/
+- Is it a passive, reactive helper? → always-on/
 
 ## Behavior notes
 

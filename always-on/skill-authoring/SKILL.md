@@ -6,12 +6,21 @@ description: >
   "refactor a SKILL.md", or needs guidance on skill structure,
   progressive disclosure, naming, or trigger descriptions.
   Also trigger when reviewing any SKILL.md file for quality.
+  Do NOT trigger for casual conversation, general questions,
+  greetings, or topics unrelated to skill creation or review.
 ---
 
 # Skill authoring
 
 Guide for writing, reviewing, and refactoring Agent Skills that follow
 the open standard (works across Claude Code, Codex, Cursor, Gemini CLI).
+
+## Activation guard
+
+This skill activates only when the user explicitly asks to write,
+review, improve, or refactor an agent skill or SKILL.md file.
+General conversations about AI, coding, or workflow do not trigger
+this skill.
 
 ## Skill anatomy
 

@@ -10,14 +10,25 @@ description: >
   to verify branch state, or when a task is complete and ready for
   merge. Governs the git operation norms that connect prompt-gateway
   (task pipeline) and versioning-and-changelog (release pipeline)
-  into a unified development flow. Do not use for non-git questions
-  or general coding tasks.
+  into a unified development flow. Do NOT trigger for casual
+  conversation, general questions, greetings, or topics unrelated to
+  git operations.
 ---
 
 # Git Workflow
 
 Standardize every git operation in a harness-managed project.
 One task = one branch. Every branch merges back to main when done.
+
+## Activation guard
+
+This skill activates only when:
+- The user explicitly requests a git operation, OR
+- The agent is about to perform a git operation as part of another skill
+
+If the user is having a casual conversation, asking questions, or
+discussing topics unrelated to git, this skill does not apply.
+Do not intercept non-git interactions.
 
 ## Core rules
 

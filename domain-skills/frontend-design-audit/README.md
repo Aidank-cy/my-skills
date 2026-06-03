@@ -1,13 +1,10 @@
 # Frontend Design Audit
 
-An agent-compatible plugin/skill package for auditing and improving the usability of existing front-end interfaces. It evaluates UI code or live websites against 15 established design principles, identifies problems, rates severity, and helps fix what it finds.
+An agent-compatible skill package for auditing and improving the usability of existing front-end interfaces. It evaluates UI code or live websites against 15 established design principles, identifies problems, rates severity, and helps fix what it finds.
 
-This package includes entrypoints for multiple agent runtimes:
+This package includes a generic agent skill entrypoint:
 
 - **Codex / generic agent skill:** `SKILL.md`
-- **Codex plugin manifest:** `.codex-plugin/plugin.json`
-- **Legacy command plugin manifest:** `.claude-plugin/plugin.json`
-- **Legacy command files and skill:** `.claude/commands/` and `.claude/skills/`
 
 ## What It Does
 
@@ -44,14 +41,6 @@ Then it implements the fixes when the active agent has local source access: acce
 
 ```text
 frontend-design-audit/
-  .codex-plugin/
-    plugin.json
-  .claude-plugin/
-    plugin.json
-    marketplace.json
-  .claude/
-    commands/
-    skills/
   SKILL.md
   references/
     heuristics.md
@@ -60,37 +49,18 @@ frontend-design-audit/
 ```
 
 The root `SKILL.md` entrypoint uses agent-neutral wording and generic
-tool guidance. The `.claude/` files are retained for command-compatible
-agent runtimes while using the same generic audit behavior.
+tool guidance.
 
 ## Installation
 
 ### Codex / Generic Agent
 
-Use the plugin package from either location:
+Install or symlink this skill directory where your agent runtime loads
+skills:
 
 ```text
 /Users/ninnnnk/my-skills/domain-skills/frontend-design-audit
-/Users/ninnnnk/.codex/plugins/frontend-design-audit
 ```
-
-For Codex, the package is discoverable through the local marketplace entry in:
-
-```text
-/Users/ninnnnk/.codex/.agents/plugins/marketplace.json
-```
-
-and enabled in:
-
-```text
-/Users/ninnnnk/.codex/config.toml
-```
-
-If the plugin does not appear immediately, restart Codex or reload plugins.
-
-### Command-Compatible Agent Runtimes
-
-The `.claude-plugin/` manifest and `.claude/` command files are still included for runtimes that understand that package layout. Point the runtime at this package path using its normal local-plugin mechanism.
 
 ## Usage
 
@@ -111,10 +81,6 @@ The agent-compatible skill supports four modes based on the prompt:
 - **Evaluate only:** produce a report without changing code
 - **Improve:** implement fixes from an existing audit
 - **Quick mode:** evaluate and auto-fix safe issues without discussion
-
-### Command Files
-
-When loaded by a runtime that supports command files, the preserved commands provide full audit, evaluate-only, improve, and quick modes.
 
 ## Example
 

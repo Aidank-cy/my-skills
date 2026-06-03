@@ -8,12 +8,25 @@ description: >
   modification task completes so CHANGELOG.md is updated under
   [Unreleased] before commit. Manage SemVer decisions, release
   sections, version-file updates, tagging, and release handoff.
+  Do NOT trigger for casual conversation, general questions,
+  greetings, or topics unrelated to versioning or releases.
 ---
 
 # Versioning And Changelog
 
 Manage the ship phase.
 Record meaningful changes, decide the correct version, and close the release path cleanly.
+
+## Activation guard
+
+This skill activates only when:
+- The user explicitly asks about versioning, changelogs, or releases, OR
+- Another skill (e.g. prompt-gateway) hands off to this skill
+  during the finalization phase of a code modification task
+
+If the user is having a casual conversation or asking questions
+unrelated to versioning or releases, this skill does not apply.
+Do not intercept non-versioning interactions.
 
 ## Core rules
 
