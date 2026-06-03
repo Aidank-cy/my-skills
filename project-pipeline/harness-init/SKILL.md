@@ -95,6 +95,14 @@ Core pipeline skills (`prompt-gateway`, `versioning-and-changelog`,
 `git-workflow`, `skill-authoring`, `sync-filter`) are user-level.
 Do not duplicate them into the project's `skills/` directory.
 
+When generating the AGENTS.md file, always include a `## Skills`
+section that lists every skill in the project's `skills/`
+directory with name and one-line purpose. This section is the
+deterministic entry point that ensures agents discover project-
+level skills regardless of which agent runtime is used. If
+`skills/` contains symlinks to project-pipeline skills, list
+them. If it contains project-local skills, list those too.
+
 For AGENTS.md generation standards, verification requirements, and
 design principles, read `references/shared-generation-standards.md`.
 
@@ -118,6 +126,8 @@ Explain these priorities:
 - review `AGENTS.md` first
 - treat hooks as deterministic enforcement
 - load skills on demand instead of all at once
+- AGENTS.md `## Skills` section ensures all agents discover
+  project-level skills — verify it lists every skill in skills/
 - use `.harness/progress.md` as cross-session memory
 - ratchet new rules or hooks in response to real failures
 

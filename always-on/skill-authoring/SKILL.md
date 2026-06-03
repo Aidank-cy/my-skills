@@ -34,9 +34,7 @@ skill-name/
 ├── references/            ← loaded into context on demand
 ├── scripts/               ← executed via bash, not loaded
 ├── assets/                ← templates, images used in output
-├── examples/              ← working code users can copy
-└── agents/                ← optional, platform-specific metadata
-    └── openai.yaml        ← Codex UI metadata and policy
+└── examples/              ← working code users can copy
 ```
 
 Do not create extraneous files. No README.md, no
@@ -170,6 +168,24 @@ something the agent already understands.
 Pick one term and use it everywhere. Do not alternate between
 "API endpoint", "URL", "route", and "path" for the same concept.
 
+### Agent-agnostic by default
+
+Write skills that work with any agent supporting the Agent
+Skills open standard. Do not hardcode agent-specific directory
+paths in skill instructions or descriptions.
+
+When a skill must reference the user-level skills directory,
+use a placeholder like "your agent's user skills directory"
+or a variable the user can set.
+
+When a skill generates project scaffolding, use the generic
+`skills/` directory — it is recognized by all agents.
+
+Agent-specific metadata files (agents/openai.yaml, CLAUDE.md,
+.cursor/rules/) are acceptable as optional additions generated
+conditionally based on detected agent type. They should never
+be the primary path.
+
 ## Scripts as extracted patterns
 
 When the same code is rewritten across 3+ skill invocations,
@@ -210,25 +226,19 @@ For project-pipeline skills:
 - Consider setting allow_implicit_invocation: false in
   agents/openai.yaml.
 
-## Codex-specific metadata
+## Platform-specific metadata
 
-Codex supports an optional agents/openai.yaml for UI metadata
-and invocation policy:
+Some agents support optional metadata files for UI and policy.
+These are agent-specific and ignored by other agents. Include
+only when targeting a specific platform.
 
-```yaml
-interface:
-  display_name: "Human-Readable Name"
-  short_description: "One-line summary for skill picker"
+Example (Codex): `agents/openai.yaml`
+Example (Cursor): `.cursor/rules/`
+Example (Claude Code): `CLAUDE.md`
 
-policy:
-  allow_implicit_invocation: true
-```
-
-Set allow_implicit_invocation to false for skills that should
-only activate on explicit $skill invocation.
-
-This file is Codex-specific. Other agents ignore it. Include
-it only for skills used with Codex.
+Consult `references/codex-best-practices.md` for Codex-specific
+fields. Do not hardcode any single agent's directory layout in
+the core skill structure.
 
 ## Review checklist
 
@@ -256,6 +266,7 @@ Apply when reviewing or refactoring any skill:
 - [ ] Imperative form, not second person
 - [ ] Reasoning over rigid ALWAYS/NEVER rules
 - [ ] Consistent terminology throughout
+- [ ] No hardcoded agent-specific paths in instructions or descriptions
 - [ ] Only contains knowledge the agent doesn't already know
 
 ### Scope
@@ -300,6 +311,8 @@ Reject these shortcuts:
 - Keeping rules that have never been triggered by a real failure
 - Creating extraneous files (README, CHANGELOG) in skill directories
 - Treating skill file count or word count as a quality signal
+- Hardcoding a single agent's directory layout when a generic
+  path would work
 
 ## References
 

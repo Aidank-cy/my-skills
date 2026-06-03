@@ -117,7 +117,10 @@ Skills are organized into three activation scopes:
 
 ### always-on/ — User-level skills
 
-Designed for permanent installation at `~/.codex/skills/`.
+Designed for permanent installation in the agent's user-level
+skills directory. Symlink to the path your agent uses, such as
+a Codex, Claude Code, Cursor, Gemini CLI, or equivalent user
+skills directory.
 These skills only activate on explicit, narrow triggers and must
 never reject or intercept casual conversation. Each has an
 activation guard section that defines when it applies.

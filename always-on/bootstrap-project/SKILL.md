@@ -5,7 +5,7 @@ description: >
   "new project", "start a project", "bootstrap a project", "init a
   project folder", or says a project name and wants to begin working
   on it. Creates a project directory under ~/Projects/, sets up the
-  project-level .codex/skills/ directory, and symlinks
+  project-level skills/ directory, and symlinks
   project-pipeline skills from the user's my-skills repository.
   Does NOT initialize the tech stack or run harness-init — the user
   will do that as a separate step after entering the project directory.
@@ -27,8 +27,8 @@ project ideas without a creation request do not trigger this skill.
 ## What this skill does
 
 1. Create `~/Projects/{project-name}/`
-2. Create `.codex/skills/` inside it
-3. Symlink all project-pipeline skills from `$HOME/Projects/my-skills/`
+2. Create `skills/` inside it
+3. Symlink all project-pipeline skills from `$HOME/my-skills/`
 4. Report what was created
 
 That is the entire scope. No tech stack init, no harness scaffold,
@@ -54,7 +54,7 @@ If the name is ambiguous, ask. Do not guess.
   → YES: warn the user and stop. Do not overwrite.
   → NO: proceed.
 
-□ Does $HOME/Projects/my-skills/project-pipeline/ exist?
+□ Does $HOME/my-skills/project-pipeline/ exist?
   → YES: proceed.
   → NO: warn that project-pipeline skills directory was not found.
         The user may need to reorganize my-skills first.
@@ -67,12 +67,12 @@ If the name is ambiguous, ask. Do not guess.
 mkdir -p "$HOME/Projects/{project-name}"
 
 # Create project-level skills directory
-mkdir -p "$HOME/Projects/{project-name}/.codex/skills"
+mkdir -p "$HOME/Projects/{project-name}/skills"
 
 # Symlink each project-pipeline skill
-for skill in "$HOME/Projects/my-skills/project-pipeline"/*/; do
+for skill in "$HOME/my-skills/project-pipeline"/*/; do
   skill_name=$(basename "$skill")
-  ln -s "$skill" "$HOME/Projects/{project-name}/.codex/skills/$skill_name"
+  ln -s "$skill" "$HOME/Projects/{project-name}/skills/$skill_name"
 done
 ```
 
@@ -81,7 +81,7 @@ All paths use `$HOME` so symlinks remain valid across environments.
 ### Step 4: Verify and report
 
 ```bash
-ls -la "$HOME/Projects/{project-name}/.codex/skills/"
+ls -la "$HOME/Projects/{project-name}/skills/"
 ```
 
 Report to the user:
@@ -90,8 +90,8 @@ Report to the user:
 ✅ Project "{project-name}" created at ~/Projects/{project-name}/
 
 Linked project-pipeline skills:
-  prompt-gateway     → ~/Projects/my-skills/project-pipeline/prompt-gateway
-  harness-init       → ~/Projects/my-skills/project-pipeline/harness-init
+  prompt-gateway     → ~/my-skills/project-pipeline/prompt-gateway
+  harness-init       → ~/my-skills/project-pipeline/harness-init
   harness-engineering-transform → ...
   sync-filter        → ...
 
@@ -102,7 +102,7 @@ Next steps:
 
 ## Skills that get symlinked
 
-All directories under `$HOME/Projects/my-skills/project-pipeline/`.
+All directories under `$HOME/my-skills/project-pipeline/`.
 If new skills are added there, the `for skill in ...` loop picks
 them up automatically.
 

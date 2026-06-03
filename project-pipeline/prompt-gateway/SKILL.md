@@ -159,6 +159,25 @@ For validation examples and rejection copy, read
 | `.harness/` | Harness runtime container |
 | `.harness/progress.md` | Cross-session state |
 
+### Project-level skill discovery
+
+Scan the project's `skills/` directory to identify available
+project-level skills:
+
+```bash
+ls skills/*/SKILL.md 2>/dev/null
+```
+
+For each discovered skill, read its `name` and `description`
+from the YAML frontmatter. Record the available skills so
+delegation decisions in Step 1 and Step 4 can reference them
+by name.
+
+If a project-level skill exists with the same name as a
+user-level skill (e.g., a local `versioning-and-changelog`
+override), the project-level version takes precedence for
+this project.
+
 ### Decision rule
 
 - 1–2 items missing: create sensible defaults, log in
@@ -173,7 +192,8 @@ For validation examples and rejection copy, read
 
 ## Step 4: Build execution plan
 
-Read: `AGENTS.md`, repo structure, `.harness/progress.md`,
+Read: `AGENTS.md`, repo structure, `skills/` (project-level
+skills discovered in Step 3), `.harness/progress.md`,
 unreleased CHANGELOG entries, latest local tag.
 
 Produce:
@@ -392,6 +412,7 @@ declarations.
 | `versioning-and-changelog` | Hard dependency. Owns CHANGELOG categorization and insertion. Step 6A is non-negotiable. |
 | `harness-engineering-transform` | Suggested when harness integrity check fails badly. |
 | `harness-remote-handoff` | Governs context recovery between sessions. |
+| Project-level `skills/` | Contains project-specific skill overrides and domain skills. Discovered in Step 3. Project-level versions take precedence over user-level skills of the same name. |
 
 ## Anti-rationalization
 

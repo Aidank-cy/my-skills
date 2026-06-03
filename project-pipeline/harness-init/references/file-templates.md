@@ -21,6 +21,17 @@ This file contains all templates for generating harness engineering files in a n
 - Build: `{real build command}`
 - Post-task verify: `./hooks/post-task-verify.sh`
 
+## Skills
+
+Project-level skills are in `skills/`. Read each skill's SKILL.md
+before starting a task to determine if it applies.
+
+Available skills:
+{list each skill in skills/ with: `- skills/{name}/SKILL.md` — {one-line purpose}}
+
+Load only the relevant skill for the current task. Do not read all
+skills at once.
+
 ## Always
 - Run `{lint}` and `{typecheck}` after every file edit. Fix failures before proceeding.
 - Write tests for new functionality. Run the full suite before declaring done.
@@ -49,6 +60,7 @@ This file contains all templates for generating harness engineering files in a n
 {e.g. "src/services/ — business logic, no direct HTTP or DB imports"}
 {e.g. "src/db/ — database models and migrations"}
 {e.g. "tests/ mirrors src/ structure"}
+- `skills/` — project-level agent skills (symlinked or generated locally)
 
 ## Patterns to follow
 {Once the first few files exist, reference them:}

@@ -1,7 +1,9 @@
 # my-skills
 
-User-level and project-level Codex skills for harness engineering
-workflows.
+User-level and project-level agent skills for harness engineering
+workflows. Agent-agnostic — works with any tool that supports the
+Agent Skills open standard (Codex, Claude Code, Cursor, Gemini CLI,
+etc.).
 
 ## Structure
 
@@ -9,8 +11,8 @@ Skills are organized by activation scope:
 
 | Directory | Scope | Installation |
 |---|---|---|
-| `always-on/` | User-level | Symlink to `~/.codex/skills/` |
-| `project-pipeline/` | Project-level | Auto-linked by `bootstrap-project` |
+| `always-on/` | User-level | Symlink to your agent's user skills dir |
+| `project-pipeline/` | Project-level | Auto-linked by `bootstrap-project` into project `skills/` |
 | `domain-skills/` | Either | Install where needed |
 
 ### always-on/
@@ -29,7 +31,7 @@ conversation.
 ### project-pipeline/
 
 Require project context. Installed per-project by bootstrap-project
-via symlinks into `.codex/skills/`.
+via symlinks into the project's `skills/` directory.
 
 | Skill | Purpose |
 |---|---|
@@ -50,11 +52,22 @@ Standalone capabilities. Install at either level.
 
 ### User-level (always-on skills)
 
+Symlink each always-on skill to your agent's user-level skills
+directory. The path varies by agent:
+
+| Agent | User skills directory |
+|---|---|
+| Codex | Check Codex docs or use a generic compatible user skills directory |
+| Claude Code | Check Claude Code docs |
+| Any agentskills.io compatible | Check agent docs |
+
 ```bash
-# Symlink each always-on skill to Codex user skills
-for skill in "$HOME/Projects/my-skills/always-on"/*/; do
+# Example: symlink to your agent's user skills dir
+AGENT_SKILLS_DIR="$HOME/.agents/skills"  # adjust for your agent
+mkdir -p "$AGENT_SKILLS_DIR"
+for skill in "$HOME/my-skills/always-on"/*/; do
   skill_name=$(basename "$skill")
-  ln -sf "$skill" "$HOME/.codex/skills/$skill_name"
+  ln -sf "$skill" "$AGENT_SKILLS_DIR/$skill_name"
 done
 ```
 
@@ -63,16 +76,16 @@ done
 When you say "create a project X", the bootstrap-project skill
 automatically:
 1. Creates `~/Projects/X/`
-2. Creates `.codex/skills/`
-3. Symlinks all `project-pipeline/` skills into it
+2. Creates `skills/` inside it
+3. Symlinks all `project-pipeline/` skills into `skills/`
 
-Then enter the project directory and tell Codex about your project
-to trigger harness-init.
+Then enter the project directory and tell the agent about your
+project to trigger harness-init.
 
 ## Workflow
 
 ```text
-Casual chat with Codex     → always-on skills stay passive
+Casual chat                → always-on skills stay passive
 "Create project X"         → bootstrap-project activates
 cd ~/Projects/X            → project-pipeline skills now available
 "Add feature Y"            → prompt-gateway activates (project-level)
