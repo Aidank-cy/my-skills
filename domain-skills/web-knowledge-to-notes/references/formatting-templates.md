@@ -2,23 +2,26 @@
 
 Reusable output templates for `web-knowledge-to-notes`.
 
-The topic folder root should contain only the final main Markdown note. Store
-all source, extraction, manifest, image, screenshot, PDF, and other generated
-support files in `assets/`.
+The topic folder root contains only the final Markdown note. Store
+all downloaded images, the Jina raw markdown, and the image manifest
+in `assets/`.
 
 ## Image Placeholder
 
-When an image cannot be obtained, insert this placeholder at the exact position
-where the image should appear in the note:
+When an image cannot be downloaded or times out, insert this at the
+exact position the image appeared in the source article:
 
 ```markdown
 > 📷 **[PLACEHOLDER: detailed description of this image/chart]**
 > Source: original image URL
-> Page location: description of where to find it in the source article (under which heading)
+> Page location: which section heading this image appeared under
 ```
 
-The placeholder description should be detailed enough for the user to quickly
-locate the image on the source page and manually screenshot it.
+The description must be specific enough for the user to locate the
+image on the original page and manually screenshot it. Bad example:
+"a chart". Good example: "bar chart comparing FCF margins of AAPL,
+MSFT, and GOOGL from 2019-2024, with Y-axis showing percentage and
+X-axis showing fiscal year."
 
 ## Final Note Template
 
@@ -26,67 +29,90 @@ Assemble the final Markdown note in this strict order:
 
 ```markdown
 ---
-title: "Descriptive Title"
-source: "https://original-url.com"
-site: "Site Name"
-date_extracted: "YYYY-MM-DD"
+title: Article Title
+source: https://original-url.com
+site: Site Name
+date_extracted: YYYY/MM/DD
 tags:
   - tag1
   - tag2
 ---
 
-# Title
+# ARTICLE-TITLE
 
-> **TL;DR**: 2-3 sentences summarizing the single most important takeaway of this note.
+> **TL;DR**: 2-3 sentences in Chinese summarizing the core takeaway.
+
+### ⚡ Key Concepts
+
+| 概念   | 含义 | 记忆要点 |
+| ------ | ---- | -------- |
+| Term 1 | ...  | ...      |
+| Term 2 | ...  | ...      |
 
 ---
 
-## Section 1 Heading
+## Source Section Heading 1
 
-[2-4 natural paragraphs, written per Step 4 rules]
+[Original article text — verbatim, original language, original
+paragraph breaks preserved]
 
-[Image or placeholder, if source article has an image here. Downloaded visuals
-use `![descriptive alt text](assets/image-name.png)` paths.]
-*图注: description*
+[Images at original positions:
+- Downloaded: ![descriptive alt](assets/filename.png)
+  *图注: Chinese description*
+- Failed: placeholder block]
 
-## Section 2 Heading
+[Formulas: $$LaTeX$$ block display]
 
-[2-4 natural paragraphs]
+> [!insight]+ 📌 Agent 点评
+>
+> **Bold label for the point:** Substantive commentary specific to
+> this section. No filler. No restating the original.
+
+---
+
+## Source Section Heading 2
+
+[Same pattern as above]
+
+---
 
 ...
 
-## Section N Heading
-
-[2-4 natural paragraphs]
-
 ---
-
-## Practical Application
-
-[If source article has relevant content or this concept has clear real-world applications]
-
-## Common Pitfalls
-
-[If source article has relevant content or agent knowledge includes common misconceptions in this area]
 
 ## Key Terms Glossary
 
-| Term   | Translation | Definition |
-| ------ | ----------- | ---------- |
-| Term 1 | ...         | ...        |
-| Term 2 | ...         | ...        |
-
-[This table must cover every financial term that appears in the note. No omissions.]
+| Term | 中文 | 定义 |
+| ---- | ---- | ---- |
+| ...  | ...  | ...  |
 
 ## Connections
 
-- Related: [[NOTE-NAME]]
-- Prerequisite: [[NOTE-NAME]]
-- Builds on: [[NOTE-NAME]]
-
-[Use the filename format specified in the user's prompt]
+- 前置知识：[[NOTE-NAME]]
+- 关联概念：[[NOTE-NAME]] — specific reason
+- 应用场景：[[NOTE-NAME]] — specific reason
 
 ---
 
-*Source: [Original Title](URL) | Extracted: YYYY-MM-DD*
+*Source: [Article Title](URL) | Extracted: YYYY/MM/DD*
 ```
+
+## Agent Commentary Format
+
+Each commentary block uses Obsidian's callout syntax with the
+`insight` type. The `+` suffix means expanded by default (the user
+can collapse it when content becomes familiar during later reviews):
+
+```markdown
+> [!insight]+ 📌 Agent 点评
+>
+> **Background the source omits:** concrete supplementary information.
+>
+> **⚠️ Common trap:** specific practical caveat with example.
+>
+> **Cross-reference:** link to related note with explanation of the
+> relationship: [[NOTE-NAME]] — how it connects.
+```
+
+Each bold label signals the type of commentary so the user can scan
+quickly. Only include types that apply to the current section.
