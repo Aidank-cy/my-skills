@@ -79,10 +79,15 @@ no content is lost during refinement.
 
 ### 2a. Section Plan
 
-1. List every H2/H3 subheading in the source article.
-2. Each subheading becomes one section in the note, preserving the
-   original order. Do not merge sections, do not split a single
-   source section into multiple sections, do not reorder.
+1. List every H2 source subheading. These H2 headings define the
+   top-level note sections and must appear in the final note in the
+   original order.
+2. Record source H3 subheadings under their parent H2. Keep them as
+   `###` subheadings in the final note when they clarify the section's
+   internal structure.
+3. Each source H2 becomes one section in the note. Do not merge H2
+   sections, do not split one source H2 into multiple H2 sections, and
+   do not reorder H2 sections.
 3. If the source has no subheadings but has obvious topic transitions,
    split those into separate sections.
 4. Locate every `![alt](url)` image tag and record which section it
@@ -134,8 +139,9 @@ Section: "How to Calculate Free Cash Flow"
 
 ### Validation
 
-- Section count ≥ number of subheadings in source article
-- Every source subheading appears in the plan
+- H2 section count ≥ number of H2 subheadings in source article
+- Every source H2 subheading appears in the plan
+- Source H3 subheadings are recorded under their parent H2
 - Every image tag is assigned to a section
 - Every section has at least one information point
 - Word count recorded for each section
@@ -253,10 +259,27 @@ tags:
 
 ### ⚡ Key Concepts
 
-| 概念   | 含义       | 记忆要点    |
-| ------ | ---------- | ----------- |
-| Term 1 | definition | memory hook |
-| Term 2 | definition | memory hook |
+<table style="width: 100%;">
+  <thead>
+    <tr>
+      <th>概念</th>
+      <th>含义</th>
+      <th>记忆要点</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Term 1</td>
+      <td>definition</td>
+      <td>memory hook</td>
+    </tr>
+    <tr>
+      <td>Term 2</td>
+      <td>definition</td>
+      <td>memory hook</td>
+    </tr>
+  </tbody>
+</table>
 
 ---
 ```
@@ -267,8 +290,35 @@ Frontmatter rules:
 - `tags`: lowercase, kebab-case
 - H1 heading and filename: UPPER-CASE-KEBAB matching the title
 
+Display formatting defaults:
+
+- Use centered HTML image blocks for downloaded images so images align
+  cleanly in Obsidian preview. Keep captions as normal Markdown text
+  below the image; do not center captions.
+
+  ```html
+  <p align="center">
+    <img src="assets/filename.png" alt="descriptive alt" />
+  </p>
+  ```
+
+  ```markdown
+  *图注: Chinese description*
+  ```
+
+- Use full-width HTML tables for `Key Concepts` and
+  `Key Terms Glossary`:
+
+  ```html
+  <table style="width: 100%;">
+  ```
+
+  Keep the same columns, wording, row count, and plain text formatting
+  as the Markdown table would have used; only the table container
+  changes to control width.
+
 Key Concepts table: 4-8 entries, each row self-contained and scannable
-in 2 seconds during review.
+in 2 seconds during review. Use the full-width HTML table form above.
 
 ### Zone 2: Article Body + Agent Commentary
 
@@ -295,6 +345,13 @@ within strict boundaries to ensure no knowledge is lost.
 - Merge duplicate paragraphs that repeat the same point
 - Reorder paragraphs within a section for better logical flow
 - Break long run-on sentences into clearer shorter sentences
+- Add `###` subheadings inside a source H2 section when the section has
+  obvious internal structure. Use them to make parallel concepts,
+  steps, categories, examples, cause/effect groups, pros/cons, or
+  contrast pairs easier to scan. This mirrors patterns such as:
+  dividend types, dividend dates, stock-exchange purposes, notable
+  exchanges, primary vs secondary market, market players, daily-vs-
+  long-term takeaways, and value vs growth investing.
 
 **What refinement is NOT allowed to do:**
 
@@ -304,10 +361,37 @@ within strict boundaries to ensure no knowledge is lost.
 - Add new claims or information to the body text (agent additions
   go only in `> [!insight]+` commentary blocks)
 - Merge separate source sections together or reorder sections
+- Add extra H2 headings that were not in the source. Agent-added
+  structure belongs at `###` or lower inside the relevant source H2.
 - Use stilted translation patterns like "这是一个...的概念" or
   "它被定义为..." — write naturally, not literally
 - Over-simplify: translating a precise 3-clause English sentence
   into a vague 1-clause Chinese sentence loses information
+
+#### Internal `###` subheading rules
+
+Use `###` subheadings as a reading aid, not as a new source-section
+map. They are appropriate when a source H2 contains:
+
+- A numbered or bulleted list of peer items
+- Multiple named types, dates, components, examples, or market players
+- A clear step-by-step process
+- A contrast such as ETF vs mutual fund, value vs growth, primary vs
+  secondary market, or high vs low P/E
+- Repeated paragraph openings that signal a list, such as "First",
+  "Second", "Another", "In contrast", or named entities in sequence
+
+Prefer short bilingual labels when useful:
+
+```markdown
+### Cash Dividends（现金股息）
+### Stock Dividends（股票股息）
+### Value Investors（价值投资者）
+### Growth Investors（成长投资者）
+```
+
+Do not add `###` headings for every paragraph. If the section reads
+clearly as two or three normal paragraphs, leave it unsegmented.
 
 #### Per-section word count rule
 
@@ -345,10 +429,12 @@ Section: "What Is Free Cash Flow?"
 If any information point is missing, add it back before moving to the
 next section. Do not proceed with missing IPs.
 
-#### Section-to-section mapping enforcement
+#### H2 section-to-section mapping enforcement
 
 The final note must have exactly the same H2 headings as the source
-article, in the same order. Before writing, verify:
+article, in the same order. `###` subheadings may be source H3s or
+agent-added internal structure, but they do not change the H2 section
+map. Before writing, verify:
 
 ```text
 Source headings: [H1, H2a, H2b, H2c, ...]
@@ -362,8 +448,8 @@ If the counts do not match, stop and fix before continuing.
 Images appear at their original positions within the refined section
 text (between the same information points as in the source):
 
-- Downloaded successfully: `![descriptive alt](assets/filename.png)`
-  followed by `*图注: Chinese description*`
+- Downloaded successfully: use the centered HTML image block
+  from the display formatting defaults, with `src="assets/filename.png"`.
 - Download failed: placeholder block
 
 #### Formula handling
@@ -444,9 +530,22 @@ If a section has no substantive, concrete commentary to add, omit the
 ```markdown
 ## Key Terms Glossary
 
-| Term | 中文 | 定义 |
-| ---- | ---- | ---- |
-| ...  | ...  | ...  |
+<table style="width: 100%;">
+  <thead>
+    <tr>
+      <th>Term</th>
+      <th>中文</th>
+      <th>定义</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+  </tbody>
+</table>
 
 ## Connections
 
@@ -514,6 +613,8 @@ Once all checks pass, save the final note to the topic folder root.
       Connections) — must equal source article heading count
 - [ ] Headings appear in the same order as the source
 - [ ] No source section was merged, split, or omitted
+- [ ] Optional `###` subheadings clarify internal structure without
+      replacing, reordering, or duplicating source H2 sections
 
 ### Information Completeness
 
@@ -549,6 +650,8 @@ Once all checks pass, save the final note to the topic folder root.
 
 - [ ] Every kept image has a downloaded file or placeholder at its
       original position in the text
+- [ ] Downloaded images use centered HTML image blocks
+- [ ] Image captions remain normal Markdown text below the image
 - [ ] Decorative/ad images are excluded — not in the final note
 - [ ] Downloaded images have descriptive kebab-case filenames
 - [ ] Placeholders have specific descriptions, source URLs, and
@@ -560,8 +663,10 @@ Once all checks pass, save the final note to the topic folder root.
 
 - [ ] Frontmatter complete: title, source, site, date_extracted, tags
 - [ ] TL;DR in Chinese, 2-3 sentences
-- [ ] Key Concepts table has 4-8 entries
+- [ ] Key Concepts table has 4-8 entries and uses
+      `<table style="width: 100%;">`
 - [ ] Glossary covers every financial/technical term
+- [ ] Key Terms Glossary uses `<table style="width: 100%;">`
 - [ ] Cross-references use `[[UPPER-CASE-KEBAB]]` format
 - [ ] Only the final `.md` note in topic folder root; everything else
       in `assets/`

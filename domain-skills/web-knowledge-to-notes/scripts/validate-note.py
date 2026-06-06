@@ -219,7 +219,9 @@ def check_required_sections(note_text):
     else:
         checks.append(("TL;DR", False, "missing"))
 
-    # Key Concepts table (heading level and emoji prefix may vary)
+    # Key Concepts table (heading level and emoji prefix may vary).
+    # Accept legacy Markdown tables and the full-width HTML table
+    # format used by newer notes for better Obsidian alignment.
     kc_match = re.search(r'Key Concepts\s*\n\s*\n(\|[\s\S]*?)(?=\n\n---|\n\n##)', note_text)
     if kc_match:
         rows = [l for l in kc_match.group(1).split('\n')
@@ -230,7 +232,30 @@ def check_required_sections(note_text):
             checks.append(("Key Concepts", False,
                           f"{len(rows)} entries (need 4-8)"))
     else:
-        checks.append(("Key Concepts", False, "table not found"))
+        html_match = re.search(
+            r'Key Concepts\s*\n\s*\n(<table\b[\s\S]*?</table>)',
+            note_text,
+            re.IGNORECASE,
+        )
+        if html_match:
+            table_html = html_match.group(1)
+            rows = re.findall(
+                r'<tr\b[\s\S]*?</tr>',
+                table_html,
+                re.IGNORECASE,
+            )
+            body_rows = [
+                row for row in rows
+                if not re.search(r'<th\b', row, re.IGNORECASE)
+            ]
+            if 4 <= len(body_rows) <= 8:
+                checks.append(("Key Concepts", True,
+                              f"{len(body_rows)} entries"))
+            else:
+                checks.append(("Key Concepts", False,
+                              f"{len(body_rows)} entries (need 4-8)"))
+        else:
+            checks.append(("Key Concepts", False, "table not found"))
 
     # Glossary
     if re.search(r'^##\s+.*(?:Glossary|glossary)', note_text, re.MULTILINE):
@@ -476,6 +501,7 @@ def check_chinese_content(note_text):
     body_lines = []
     in_frontmatter = False
     in_code = False
+    in_html_table = False
     for line in note_text.split('\n'):
         if line.strip() == '---':
             in_frontmatter = not in_frontmatter
@@ -487,6 +513,16 @@ def check_chinese_content(note_text):
             continue
         if in_code:
             continue
+        if re.search(r'<table\b', line, re.IGNORECASE):
+            in_html_table = True
+            continue
+        if in_html_table:
+            if re.search(r'</table>', line, re.IGNORECASE):
+                in_html_table = False
+            continue
+        if re.search(r'<img\b', line, re.IGNORECASE):
+            continue
+        line = re.sub(r'<[^>]+>', '', line)
         # Skip headings, table rows, image refs, callout markers, links
         if (line.startswith('#') or line.startswith('|') or
             line.startswith('![') or line.startswith('> 📷') or

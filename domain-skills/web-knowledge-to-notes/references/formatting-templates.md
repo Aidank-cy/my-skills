@@ -44,10 +44,27 @@ tags:
 
 ### ⚡ Key Concepts
 
-| 概念   | 含义 | 记忆要点 |
-| ------ | ---- | -------- |
-| Term 1 | ...  | ...      |
-| Term 2 | ...  | ...      |
+<table style="width: 100%;">
+  <thead>
+    <tr>
+      <th>概念</th>
+      <th>含义</th>
+      <th>记忆要点</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Term 1</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <td>Term 2</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+  </tbody>
+</table>
 
 ---
 
@@ -56,8 +73,15 @@ tags:
 [Original article text — verbatim, original language, original
 paragraph breaks preserved]
 
+[Optional `###` subheadings inside this H2 when the content has clear
+parallel categories, steps, examples, contrast pairs, or named items.
+Do not add extra H2 headings.]
+
 [Images at original positions:
-- Downloaded: ![descriptive alt](assets/filename.png)
+- Downloaded:
+  <p align="center">
+    <img src="assets/filename.png" alt="descriptive alt" />
+  </p>
   *图注: Chinese description*
 - Failed: placeholder block]
 
@@ -82,9 +106,22 @@ paragraph breaks preserved]
 
 ## Key Terms Glossary
 
-| Term | 中文 | 定义 |
-| ---- | ---- | ---- |
-| ...  | ...  | ...  |
+<table style="width: 100%;">
+  <thead>
+    <tr>
+      <th>Term</th>
+      <th>中文</th>
+      <th>定义</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+  </tbody>
+</table>
 
 ## Connections
 
