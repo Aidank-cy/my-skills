@@ -44,6 +44,10 @@ CAPTION_KEYWORDS = (
     "柱状图",
     "折线图",
 )
+BOILERPLATE_LINE_PATTERNS = (
+    re.compile(r"^点击查看详情[\W_]*$"),
+    re.compile(r"^查看详情[\W_]*$"),
+)
 
 MAIN_NS = "http://schemas.openxmlformats.org/spreadsheetml/2006/main"
 OFFICE_REL_NS = "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
@@ -82,6 +86,23 @@ def remove_caption_lines(text: str) -> str:
     return "\n".join(line for line in normalize_body(text).split("\n") if not is_caption_line(line))
 
 
+def is_boilerplate_line(text: str) -> bool:
+    normalized = re.sub(r"\s+", "", text)
+    return any(pattern.match(normalized) for pattern in BOILERPLATE_LINE_PATTERNS)
+
+
+def clean_body_text(text: str, keep_captions: bool = False) -> str:
+    lines = [
+        line
+        for line in normalize_body(text).split("\n")
+        if not is_boilerplate_line(line)
+    ]
+    body = "\n".join(lines)
+    if not keep_captions:
+        body = remove_caption_lines(body)
+    return body
+
+
 def element_is_centered(element: Any) -> bool:
     for parent in [element, *element.parents]:
         style = parent.attrs.get("style", "") if hasattr(parent, "attrs") else ""
@@ -116,6 +137,8 @@ def previous_visible_sibling_has_media(element: Any) -> bool:
 
 
 def should_skip_extracted_text(element: Any, text: str, keep_captions: bool) -> bool:
+    if is_boilerplate_line(text):
+        return True
     if keep_captions:
         return False
     if is_caption_line(text):
@@ -157,9 +180,7 @@ def extract_wechat_article(html_content: str, keep_captions: bool = False) -> tu
         if text and not should_skip_extracted_text(element, text, keep_captions):
             paragraphs.append(text)
 
-    body = normalize_body("\n".join(paragraphs))
-    if not keep_captions:
-        body = remove_caption_lines(body)
+    body = clean_body_text("\n".join(paragraphs), keep_captions=keep_captions)
     return title, body
 
 
@@ -177,9 +198,7 @@ def load_articles(path: Path, keep_captions: bool = False) -> list[Article]:
 
         title = str(item.get("title", "")).strip()
         url = str(item.get("url", "")).strip()
-        body = normalize_body(str(item.get("body", "")))
-        if not keep_captions:
-            body = remove_caption_lines(body)
+        body = clean_body_text(str(item.get("body", "")), keep_captions=keep_captions)
 
         missing = [name for name, value in {"title": title, "url": url, "body": body}.items() if not value]
         if missing:

@@ -6,8 +6,9 @@ description: >
   "update viewpoints", "replace viewpoint links", "fill in new articles",
   "coal weekly report viewpoint updates", provides 5 WeChat article links for
   the Excel database, or says "更新观点", "替换链接", "填入新文章". Also handle
-  blocked WeChat extraction by requesting manual article text. Do NOT trigger
-  for unrelated Excel editing, general coal research, or casual discussion.
+  WeChat fetching with direct browser-like requests and blocked extraction by
+  requesting manual article text. Do NOT trigger for unrelated Excel editing,
+  general coal research, or casual discussion.
 ---
 
 # Coal Viewpoint Update
@@ -53,7 +54,7 @@ already merged for body areas; write to the top-left cell in column D.
 
 ## Workflow
 
-1. Fetch each article page when possible.
+1. Fetch each article page with the bundled direct-request helper when possible.
 2. Extract the article title and body from WeChat HTML.
 3. Apply the caption policy. Remove chart/image caption text by default; keep it
    only when the user explicitly requests caption retention.
@@ -73,6 +74,22 @@ already merged for body areas; write to the top-left cell in column D.
 
 For WeChat Official Account articles, prefer the `<h1 id="activity-name">`
 title and extract body text from `<div id="js_content">`.
+
+Use the bundled direct-request helper for five WeChat URLs before asking for
+manual text. It sends ordinary browser-like request headers, warms a session on
+`mp.weixin.qq.com`, saves optional HTML captures for review, and writes the same
+five-entry article JSON consumed by the workbook updater:
+
+```bash
+python scripts/fetch_wechat_articles.py \
+  -o /path/to/articles.json \
+  --html-dir /path/to/fetched-html \
+  "https://mp.weixin.qq.com/s/..." \
+  "https://mp.weixin.qq.com/s/..." \
+  "https://mp.weixin.qq.com/s/..." \
+  "https://mp.weixin.qq.com/s/..." \
+  "https://mp.weixin.qq.com/s/..."
+```
 
 Preserve paragraph order with single newlines between paragraphs. Exclude
 scripts, styles, images, videos, iframes, author metadata, source notices,
@@ -168,4 +185,5 @@ the extension, for example `中信建投煤炭行业数据库20260529tmp.xlsx`.
 | When | Read or run |
 | --- | --- |
 | Need the article JSON shape or manual fallback format | `references/article-input-template.md` |
+| Need to fetch five WeChat article URLs into article JSON | `scripts/fetch_wechat_articles.py` |
 | Need to update the workbook from prepared article data | `scripts/update_viewpoints.py` |
